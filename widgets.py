@@ -1,16 +1,23 @@
 import threading
 
+import collections
 from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from matplotlib.backends.backend_gtk3cairo import (FigureCanvasGTK3Cairo as FigureCanvas)
 from matplotlib.backends.backend_gtk3 import NavigationToolbar2GTK3 as NavigationToolbar
 from gi.repository import GObject
 
 
+plt.ion()
+
 class Chart:
     def __init__(self, parent, app, data_handler, labels, last_values=1000):
         self.last_values = last_values
-        self.y = [[0, 0] for i in range(0, last_values)]
+        self.data = [
+            collections.deque(range(0, last_values)),
+            collections.deque(range(0, last_values)),
+        ]
         self.figure = Figure(figsize=(5, 4), dpi=100)
         self.axes = self.figure.add_subplot(111)
         self.axes.set_ylim(0, 65535)
@@ -23,17 +30,19 @@ class Chart:
         parent.add(canvas)
 
         app.input.handlers.append(self.process)
-        self.animation = FuncAnimation(self.figure, self.update, interval=50)
+        self.animation = FuncAnimation(self.figure, self.update, interval=100)
 
     def process(self, row):
-        self.y.append(self.data_handler(row))
+        a, b = self.data_handler(row)
+        self.data[0].append(a)
+        self.data[1].append(b)
 
-        if len(self.y) > self.last_values:
-            self.y.pop(0)
+        self.data[0].popleft()
+        self.data[1].popleft()
 
     def update(self, *kwargs):
         for i, _ in enumerate(self.line):
-            self.line[i].set_ydata([v[i] for v in self.y])
+            self.line[i].set_ydata(self.data[i])
         self.figure.legend()
 
 

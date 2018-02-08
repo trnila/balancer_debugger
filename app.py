@@ -13,7 +13,6 @@ from input import Input
 
 class App:
     def __init__(self, window, args):
-        print(args)
         self.window = window
         self.input = Input(args.serial, args.baudrate)
 

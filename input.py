@@ -22,6 +22,5 @@ class Input:
                 print(e)
 
     def start_threaded(self):
-        print(self.handlers)
         t = Thread(target=self.start)
         t.start()

@@ -2,9 +2,10 @@ from threading import Thread
 
 import serial
 
+
 class Input:
-    def __init__(self):
-        self.serial = serial.Serial('/dev/pts/8')
+    def __init__(self, input, baudrate):
+        self.serial = serial.Serial(input, baudrate=baudrate)
         self.handlers = []
         self.pause = False
 

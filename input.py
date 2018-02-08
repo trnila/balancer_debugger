@@ -8,6 +8,7 @@ class Input:
         self.serial = serial.Serial(input, baudrate=baudrate)
         self.handlers = []
         self.pause = False
+        self._t = None
 
     def start(self):
         while True:
@@ -22,5 +23,6 @@ class Input:
                 print(e)
 
     def start_threaded(self):
-        t = Thread(target=self.start)
-        t.start()
+        self._t = Thread(target=self.start)
+        self._t.daemon = True
+        self._t.start()

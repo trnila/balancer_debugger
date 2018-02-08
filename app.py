@@ -4,7 +4,7 @@ from widgets import Chart, Touches
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
-from matplotlib.backends.backend_gtk3agg import (FigureCanvasGTK3Agg as FigureCanvas)
+from matplotlib.backends.backend_gtk3cairo import (FigureCanvasGTK3Cairo as FigureCanvas)
 from matplotlib.backends.backend_gtk3 import NavigationToolbar2GTK3 as NavigationToolbar
 import argparse
 
@@ -38,9 +38,8 @@ window.connect("delete_event", Gtk.main_quit)
 app = App(window, parser.parse_args())
 builder.connect_signals(app)
 
-app.add_chart("chart", Chart(app, lambda row: [int(row['RX']), int(row['RY'])], ['RX', 'RY']))
+Chart(builder.get_object("chart"), app, lambda row: [int(row['RX']), int(row['RY'])], ['RX', 'RY'])
 app.add_chart("touch", Touches(app))
-app.add_chart("servos", Chart(app, lambda row: [int(row['RY']), int(row['RY'])], ['USX', 'USY']))
 
 window.show_all()
 app.input.start_threaded()

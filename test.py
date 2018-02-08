@@ -60,28 +60,22 @@ y = []
 prev = [0, 0]
 speed = [0, 0]
 moving = [Moving(), Moving()]
+fails = 0
 for read in inp:
     print(read)
     write = []
     for i, val in enumerate(read):
-        if i > 0:
-            continue
-
-        moving[i].add(val)
-
-#        if abs(val - moving[i].get()) > 1000  and 0:
- #           val = prev[i] + speed[i] 
-  #      speed[i] = val - prev[i]
-
-        v = moving[i].get()
+        v = val
         if v > 60000:
             v = prev[i] + speed[i]
-            moving[i].replace(v)
+            fails += 1
+            if fails > 20:
+                v = 65000
+        else:
+            fails = 0
+        speed[i] = v - prev[i]
 
-
-
-        prev[i] = v
-        write.append(val)
+#        write.append(val)
         write.append(v)
     y.append(write)
 

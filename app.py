@@ -4,7 +4,7 @@ from widgets import Chart, Touches
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
-from matplotlib.backends.backend_gtk3cairo import (FigureCanvasGTK3Cairo as FigureCanvas)
+from matplotlib.backends.backend_gtk3agg import (FigureCanvasGTK3Agg as FigureCanvas)
 from matplotlib.backends.backend_gtk3 import NavigationToolbar2GTK3 as NavigationToolbar
 import argparse
 
@@ -19,12 +19,6 @@ class App:
     def pause(self, param):
         self.input.pause = param.get_active()
 
-    def add_chart(self, object, chart):
-        canvas = FigureCanvas(chart.figure)
-        canvas.set_size_request(800, 600)
-        builder.get_object(object).add(NavigationToolbar(canvas, window))
-        builder.get_object(object).add(canvas)
-
 parser = argparse.ArgumentParser()
 parser.add_argument('serial')
 parser.add_argument('--baudrate', default=115200)
@@ -38,7 +32,7 @@ app = App(window, parser.parse_args())
 builder.connect_signals(app)
 
 Chart(builder.get_object("chart"), app, lambda row: [int(row['RX']), int(row['RY'])], ['RX', 'RY'])
-app.add_chart("touch", Touches(app))
+Touches(builder.get_object("touch"), app)
 
 window.show_all()
 app.input.start_threaded()

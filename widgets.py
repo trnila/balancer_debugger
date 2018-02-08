@@ -30,7 +30,7 @@ class Chart:
         parent.add(canvas)
 
         app.input.handlers.append(self.process)
-        self.animation = FuncAnimation(self.figure, self.update, interval=100)
+        self.animation = FuncAnimation(self.figure, self.update)
 
     def process(self, row):
         a, b = self.data_handler(row)
@@ -43,11 +43,11 @@ class Chart:
     def update(self, *kwargs):
         for i, _ in enumerate(self.line):
             self.line[i].set_ydata(self.data[i])
-        self.figure.legend()
+        return self.line
 
 
 class Touches:
-    def __init__(self, app, last_values=100):
+    def __init__(self, parent, app, last_values=100):
         self.last_values = last_values
         self.x = []
         self.y = []
@@ -58,8 +58,13 @@ class Touches:
         self.line, = self.axes.plot(self.x, self.y, '-')
         self.lock = threading.Lock()
 
-        GObject.timeout_add(100, self.update)
+        canvas = FigureCanvas(self.figure)
+        canvas.set_size_request(800, 600)
+        parent.add(NavigationToolbar(canvas, app.window))
+        parent.add(canvas)
+
         app.input.handlers.append(self.process)
+        self.animation = FuncAnimation(self.figure, self.update)
 
     def process(self, row):
         with self.lock:
@@ -70,9 +75,8 @@ class Touches:
                 self.y.pop(0)
                 self.x.pop(0)
 
-    def update(self):
+    def update(self, *kwargs):
         with self.lock:
             self.line.set_xdata(self.x)
             self.line.set_ydata(self.y)
-        self.figure.canvas.draw()
-        return True
+        return self.line

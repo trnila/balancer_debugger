@@ -47,7 +47,7 @@ class Chart:
 
 
 class Touches:
-    def __init__(self, app, last_values=1000):
+    def __init__(self, app, last_values=100):
         self.last_values = last_values
         self.x = []
         self.y = []

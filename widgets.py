@@ -40,6 +40,7 @@ class Touches:
         self.axes = self.figure.add_subplot(111)
         self.axes.set_ylim(0, 65535)
         self.axes.set_xlim(0, 65535)
+        self.line, = self.axes.plot(self.x, self.y, '-')
         self.lock = threading.Lock()
 
         GObject.timeout_add(100, self.update)
@@ -55,8 +56,8 @@ class Touches:
                 self.x.pop(0)
 
     def update(self):
-        self.axes.clear()
         with self.lock:
-            self.axes.plot(self.x, self.y, '-')
+            self.line.set_xdata(self.x)
+            self.line.set_ydata(self.y)
         self.figure.canvas.draw()
         return True

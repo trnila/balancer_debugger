@@ -5,13 +5,13 @@ from gi.repository import GObject
 
 
 class Chart:
-    def __init__(self, app, data_handler, last_values=1000):
+    def __init__(self, app, data_handler, labels, last_values=1000):
         self.last_values = last_values
         self.y = [[0, 0] for i in range(0, last_values)]
         self.figure = Figure(figsize=(5, 4), dpi=100)
         self.axes = self.figure.add_subplot(111)
         self.axes.set_ylim(0, 65535)
-        self.line = self.axes.plot(range(0, len(self.y)), self.y, '-')
+        self.line = [self.axes.plot(range(0, last_values), range(0, last_values), '-', label=label)[0] for label in labels]
         self.data_handler = data_handler
 
         GObject.timeout_add(100, self.update)
@@ -26,6 +26,7 @@ class Chart:
     def update(self):
         for i, _ in enumerate(self.line):
             self.line[i].set_ydata([v[i] for v in self.y])
+        self.figure.legend()
         self.figure.canvas.draw()
         return True
 

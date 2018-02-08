@@ -23,7 +23,7 @@ class Chart:
         parent.add(canvas)
 
         app.input.handlers.append(self.process)
-        self.animation = FuncAnimation(self.figure, self.update)
+        self.animation = FuncAnimation(self.figure, self.update, interval=50)
 
     def process(self, row):
         self.y.append(self.data_handler(row))

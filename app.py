@@ -38,8 +38,9 @@ window.connect("delete_event", Gtk.main_quit)
 app = App(window, parser.parse_args())
 builder.connect_signals(app)
 
-app.add_chart("chart", Chart(app))
+app.add_chart("chart", Chart(app, lambda row: [int(row['RX']), int(row['RY'])]))
 app.add_chart("touch", Touches(app))
+app.add_chart("servos", Chart(app, lambda row: [int(row['RY']), int(row['RY'])]))
 
 window.show_all()
 app.input.start_threaded()

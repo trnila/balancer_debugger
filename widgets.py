@@ -5,19 +5,20 @@ from gi.repository import GObject
 
 
 class Chart:
-    def __init__(self, app, last_values=1000):
+    def __init__(self, app, data_handler, last_values=1000):
         self.last_values = last_values
         self.y = [[0, 0] for i in range(0, last_values)]
         self.figure = Figure(figsize=(5, 4), dpi=100)
         self.axes = self.figure.add_subplot(111)
         self.axes.set_ylim(0, 65535)
         self.line = self.axes.plot(range(0, len(self.y)), self.y, '-')
+        self.data_handler = data_handler
 
         GObject.timeout_add(100, self.update)
         app.input.handlers.append(self.process)
 
     def process(self, row):
-        self.y.append([int(row['RX']), int(row['RY'])])
+        self.y.append(self.data_handler(row))
 
         if len(self.y) > self.last_values:
             self.y.pop(0)

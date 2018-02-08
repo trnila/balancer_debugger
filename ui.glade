@@ -29,6 +29,30 @@
           </packing>
         </child>
         <child>
+          <object class="GtkBox" id="servos">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="orientation">vertical</property>
+            <child>
+              <placeholder/>
+            </child>
+          </object>
+          <packing>
+            <property name="position">1</property>
+          </packing>
+        </child>
+        <child type="tab">
+          <object class="GtkLabel">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">servos</property>
+          </object>
+          <packing>
+            <property name="position">1</property>
+            <property name="tab_fill">False</property>
+          </packing>
+        </child>
+        <child>
           <object class="GtkBox" id="touch">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
@@ -44,7 +68,7 @@
             </child>
           </object>
           <packing>
-            <property name="position">1</property>
+            <property name="position">2</property>
           </packing>
         </child>
         <child type="tab">
@@ -54,7 +78,7 @@
             <property name="label" translatable="yes">Touches</property>
           </object>
           <packing>
-            <property name="position">1</property>
+            <property name="position">2</property>
             <property name="tab_fill">False</property>
           </packing>
         </child>

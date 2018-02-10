@@ -12,7 +12,7 @@ from gi.repository import GObject
 plt.ion()
 
 class Chart:
-    def __init__(self, parent, app, data_handler, labels, last_values=1000):
+    def __init__(self, parent, app, data_handler, labels, ylimits, last_values=2000):
         self.last_values = last_values
         self.data = [
             collections.deque(range(0, last_values)),
@@ -20,7 +20,7 @@ class Chart:
         ]
         self.figure = Figure(figsize=(5, 4), dpi=100)
         self.axes = self.figure.add_subplot(111)
-        self.axes.set_ylim(0, 65535)
+        self.axes.set_ylim(*ylimits)
         self.line = [self.axes.plot(range(0, last_values), range(0, last_values), '-', label=label)[0] for label in labels]
         self.data_handler = data_handler
 
@@ -80,3 +80,27 @@ class Touches:
             self.line.set_xdata(self.x)
             self.line.set_ydata(self.y)
         return self.line
+
+
+class Console:
+    def __init__(self, target, app, max_rows=50):
+        self.target = target
+        self.app = app
+        self.lines = []
+        self.max_rows = max_rows
+
+        app.input.handlers.append(self.fill_console)
+
+    def fill_console(self, row):
+        buffer = self.target.get_buffer()
+        self.lines.append(str(row))
+        if len(self.lines) > self.max_rows:
+            self.lines.pop(0)
+
+
+        def dothat():
+            end_iter = buffer.get_end_iter()
+            buffer.insert(end_iter, str(row) + "\n")
+            self.target.scroll_to_mark(buffer.get_insert(), 0, False, 0, 0)
+
+        GObject.idle_add(dothat)

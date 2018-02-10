@@ -70,7 +70,7 @@ processor = Fixer().process
 for row in iter:
     row = processor(row)
     line = " ".join(["{}={}".format(k, row[k]) for k in row.keys()])
-    print(line)
+    #print(line)
     ser.write((line + "\n").encode())
     ser.flushOutput()
     time.sleep(0.02)

@@ -189,8 +189,8 @@ def update():
         'RY': int
     }
 
-    defaults = dict((key, 0) for key in mapper.keys())
-    row = {**defaults, **row}
+    if not all([k in mapper.keys() for k in row]):
+        return
 
     for k, v in mapper.items():
         row[k] = v(row[k])

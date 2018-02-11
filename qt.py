@@ -83,27 +83,29 @@ class ControlWidget(QDialog, Ui_ControlForm):
 
         self.mode.currentTextChanged.connect(self.send_cmd("mode"))
         self.const_k.valueChanged.connect(self.send_cmd("set_k"))
+        self.pauseBtn.clicked.connect(self.pause)
 
     def send_cmd(self, cmd):
         def fn(*args):
             self.serial.send_cmd(cmd, *args)
         return fn
 
-    def change_mode(self, text):
-        self.serial.send_cmd("mode", text)
-
-    def change_const(self, val):
-        print(val)
+    def pause(self, pause):
+        self.serial.pause = pause
 
 
 class Input:
     def __init__(self, serial):
-        self.serial : Serial = serial
+        self.serial: Serial = serial
+        self.pause = False
 
     def send_cmd(self, cmd, *arguments):
         text = " ".join([cmd] + list(map(str, arguments)))
         print(text)
         self.serial.write((text + "\n").encode())
+
+    def readline(self):
+        return self.serial.readline().decode().strip()
 
 
 parser = argparse.ArgumentParser()
@@ -145,8 +147,8 @@ charts = [
     Touch(p3)
 ]
 
-serial = Serial(args.serial, args.baudrate)
-control = ControlWidget(Input(serial))
+serial = Input(Serial(args.serial, args.baudrate))
+control = ControlWidget(serial)
 
 layout = QtGui.QGridLayout()
 w.setLayout(layout)
@@ -155,7 +157,10 @@ layout.addWidget(control)
 
 
 def update():
-    line = serial.readline().decode().strip()
+    line = serial.readline()
+    if serial.pause:
+        return
+
     row = dict([i.split('=', 2) for i in line.split(' ') if len(i.split('=', 2)) == 2])
 
     mapper = {

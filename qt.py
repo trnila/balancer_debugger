@@ -1,3 +1,4 @@
+import argparse
 from collections import deque
 
 from serial import Serial
@@ -5,10 +6,7 @@ import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 import numpy as np
 import logging
-from input import Input
 
-
-win = pg.GraphicsWindow()
 
 class Chunked:
     def __init__(self, plot, key, **kwargs):
@@ -75,6 +73,13 @@ class Touch:
             self.y.popleft()
 
 
+parser = argparse.ArgumentParser()
+parser.add_argument('--serial', default='/dev/ttyACM0')
+parser.add_argument('--baudrate', default=115200)
+args = parser.parse_args()
+
+win = pg.GraphicsWindow()
+
 win.nextRow()
 p5 = win.addPlot(colspan=2, title='Resistance')
 p5.addLegend()
@@ -88,7 +93,6 @@ p6.addLegend()
 p6.setLabel('bottom', 'Time', 's')
 p6.setXRange(-10, 0)
 p6.setYRange(0, 1)
-
 
 p3 = win.addPlot(title="Touch resistance", colspan=1)
 p3.setXRange(0, 65535)
@@ -104,7 +108,8 @@ charts = [
     Touch(p3)
 ]
 
-serial = Serial("/dev/pts/5", 115200)
+serial = Serial(args.serial, args.baudrate)
+
 
 def update():
     line = serial.readline().decode().strip()

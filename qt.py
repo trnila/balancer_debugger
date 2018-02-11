@@ -94,6 +94,9 @@ class ControlWidget(QDialog, Ui_ControlForm):
     def pause(self, pause):
         self.serial.pause = pause
 
+    def update(self, row):
+        self.current.setText("[{}, {}]".format(row['RX'], row['RY']))
+
 
 class Input:
     def __init__(self, serial):
@@ -106,7 +109,9 @@ class Input:
         self.serial.write((text + "\n").encode())
 
     def readline(self):
-        return self.serial.readline().decode().strip()
+        line = self.serial.readline().decode().strip()
+        print(line)
+        return line
 
 
 parser = argparse.ArgumentParser()
@@ -138,16 +143,6 @@ p3 = win.addPlot(colspan=1, title="Touch resistance")
 p3.setXRange(0, 65535)
 p3.setYRange(0, 65535)
 
-charts = [
-    Chunked(p5, 'RX', pen=(255, 0, 0)),
-    Chunked(p5, 'RY', pen=(0, 255, 0)),
-
-    Chunked(p6, 'USX', pen=(255, 0, 0)),
-    Chunked(p6, 'USY', pen=(0, 255, 0)),
-
-    Touch(p3)
-]
-
 serial = Input(Serial(args.serial, args.baudrate))
 control = ControlWidget(serial)
 
@@ -155,6 +150,18 @@ layout = QtGui.QGridLayout()
 w.setLayout(layout)
 layout.addWidget(win)
 layout.addWidget(control)
+
+charts = [
+    Chunked(p5, 'RX', pen=(255, 0, 0)),
+    Chunked(p5, 'RY', pen=(0, 255, 0)),
+
+    Chunked(p6, 'USX', pen=(255, 0, 0)),
+    Chunked(p6, 'USY', pen=(0, 255, 0)),
+
+    Touch(p3),
+
+    control
+]
 
 
 def update():

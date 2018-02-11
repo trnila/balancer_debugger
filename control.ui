@@ -30,6 +30,13 @@
       </spacer>
      </item>
      <item>
+      <widget class="QLabel" name="current">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="pauseBtn">
        <property name="text">
         <string>Pause</string>

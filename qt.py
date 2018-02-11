@@ -102,6 +102,7 @@ class Input:
     def __init__(self, serial):
         self.serial: Serial = serial
         self.pause = False
+        self.flush_input()
 
     def send_cmd(self, cmd, *arguments):
         text = " ".join([cmd] + list(map(str, arguments)))
@@ -112,6 +113,16 @@ class Input:
         line = self.serial.readline().decode().strip()
         print(line)
         return line
+
+    def flush_input(self):
+        self.serial.timeout = 0.005
+        while self.serial.readline():
+            pass
+
+        for i in range(0, 50):
+            self.serial.readline()
+
+        self.serial.timeout = None
 
 
 parser = argparse.ArgumentParser()

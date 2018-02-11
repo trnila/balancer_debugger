@@ -82,6 +82,7 @@ class ControlWidget(QDialog, Ui_ControlForm):
         self.setupUi(self)
 
         self.mode.currentTextChanged.connect(self.send_cmd("mode"))
+        self.const_p.valueChanged.connect(self.send_cmd("set_p"))
         self.const_k.valueChanged.connect(self.send_cmd("set_k"))
         self.pauseBtn.clicked.connect(self.pause)
 

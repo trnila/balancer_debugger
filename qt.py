@@ -131,6 +131,7 @@ class Input:
 
         self.serial.timeout = None
 
+logging.getLogger().setLevel(logging.DEBUG)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--serial', default='/dev/ttyACM0')
@@ -155,7 +156,7 @@ p6 = win.addPlot(colspan=2, title='USX/USY')
 p6.addLegend()
 p6.setLabel('bottom', 'Time', 's')
 p6.setXRange(-10, 0)
-p6.setYRange(0, 1)
+p6.setYRange(0, 0.1)
 
 p3 = win.addPlot(colspan=1, title="Touch resistance")
 p3.setXRange(0, 65535)
@@ -196,7 +197,8 @@ def update():
         'RY': int
     }
 
-    if not all([k in mapper.keys() for k in row]):
+    if not all([k in row.keys() for k in mapper.keys()]):
+        logging.debug("not all keys available")
         return
 
     for k, v in mapper.items():

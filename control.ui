@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>229</width>
+    <height>134</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -33,6 +33,16 @@
       <widget class="QLabel" name="current">
        <property name="text">
         <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="enableServos">
+       <property name="text">
+        <string>Enable servos</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

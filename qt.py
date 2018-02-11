@@ -85,6 +85,7 @@ class ControlWidget(QDialog, Ui_ControlForm):
         self.const_p.valueChanged.connect(self.send_cmd("set_p"))
         self.const_k.valueChanged.connect(self.send_cmd("set_k"))
         self.pauseBtn.clicked.connect(self.pause)
+        self.enableServos.clicked.connect(self.send_cmd("enable_servos"))
 
     def send_cmd(self, cmd):
         def fn(*args):
@@ -105,13 +106,19 @@ class Input:
         self.flush_input()
 
     def send_cmd(self, cmd, *arguments):
-        text = " ".join([cmd] + list(map(str, arguments)))
+        def mapper(s):
+            if type(s) == bool:
+                s = 1 if s else 0
+
+            return str(s)
+
+        text = " ".join([cmd] + list(map(mapper, arguments)))
         print(text)
         self.serial.write((text + "\n").encode())
 
     def readline(self):
         line = self.serial.readline().decode().strip()
-        print(line)
+        #print(line)
         return line
 
     def flush_input(self):

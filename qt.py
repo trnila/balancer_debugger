@@ -2,8 +2,10 @@ import argparse
 from collections import deque
 
 from serial import Serial
+from ui_control import Ui_ControlForm
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
+from PyQt5.QtGui import QDialog
 import numpy as np
 import logging
 
@@ -73,12 +75,47 @@ class Touch:
             self.y.popleft()
 
 
+class ControlWidget(QDialog, Ui_ControlForm):
+    def __init__(self, input):
+        super(QDialog, self).__init__()
+        self.serial = input
+        self.setupUi(self)
+
+        self.mode.currentTextChanged.connect(self.send_cmd("mode"))
+        self.const_k.valueChanged.connect(self.send_cmd("set_k"))
+
+    def send_cmd(self, cmd):
+        def fn(*args):
+            self.serial.send_cmd(cmd, *args)
+        return fn
+
+    def change_mode(self, text):
+        self.serial.send_cmd("mode", text)
+
+    def change_const(self, val):
+        print(val)
+
+
+class Input:
+    def __init__(self, serial):
+        self.serial : Serial = serial
+
+    def send_cmd(self, cmd, *arguments):
+        text = " ".join([cmd] + list(map(str, arguments)))
+        print(text)
+        self.serial.write((text + "\n").encode())
+
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--serial', default='/dev/ttyACM0')
 parser.add_argument('--baudrate', default=115200)
 args = parser.parse_args()
 
-win = pg.GraphicsWindow()
+
+app = QtGui.QApplication([])
+w = QtGui.QWidget()
+
+win = pg.MultiPlotWidget()
 
 win.nextRow()
 p5 = win.addPlot(colspan=2, title='Resistance')
@@ -109,6 +146,12 @@ charts = [
 ]
 
 serial = Serial(args.serial, args.baudrate)
+control = ControlWidget(Input(serial))
+
+layout = QtGui.QGridLayout()
+w.setLayout(layout)
+layout.addWidget(win)
+layout.addWidget(control)
 
 
 def update():
@@ -137,11 +180,7 @@ def update():
 
 timer = pg.QtCore.QTimer()
 timer.timeout.connect(update)
-timer.start(50)
+timer.start(0)
 
-## Start Qt event loop unless running in interactive mode or using pyside.
-if __name__ == '__main__':
-    import sys
-
-    if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
-        QtGui.QApplication.instance().exec_()
+w.show()
+app.exec_()

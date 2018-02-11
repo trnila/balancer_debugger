@@ -120,7 +120,7 @@ w = QtGui.QWidget()
 win = pg.MultiPlotWidget()
 
 win.nextRow()
-p5 = win.addPlot(colspan=2, title='Resistance')
+p5 = win.addPlot(colspan=3, title='Resistance')
 p5.addLegend()
 p5.setLabel('bottom', 'Time', 's')
 p5.setXRange(-10, 0)
@@ -133,7 +133,7 @@ p6.setLabel('bottom', 'Time', 's')
 p6.setXRange(-10, 0)
 p6.setYRange(0, 1)
 
-p3 = win.addPlot(title="Touch resistance", colspan=1)
+p3 = win.addPlot(colspan=1, title="Touch resistance")
 p3.setXRange(0, 65535)
 p3.setYRange(0, 65535)
 

@@ -3,7 +3,7 @@ import time
 import random
 import sys
 
-ser = serial.Serial('/dev/pts/7')
+ser = serial.Serial('/dev/pts/4')
 
 rand = len(sys.argv) != 2
 
@@ -70,7 +70,7 @@ processor = Fixer().process
 for row in iter:
     row = processor(row)
     line = " ".join(["{}={}".format(k, row[k]) for k in row.keys()])
-    #print(line)
+    #print(line, flush=True)
     ser.write((line + "\n").encode())
     ser.flushOutput()
     time.sleep(0.02)

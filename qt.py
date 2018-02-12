@@ -114,6 +114,8 @@ class Input:
         def mapper(s):
             if type(s) == bool:
                 s = 1 if s else 0
+            elif type(s) == float:
+                return format(s, '.10f')
 
             return str(s)
 
@@ -157,11 +159,13 @@ p5.setXRange(-10, 0)
 p5.setYRange(0, 65535)
 
 win.nextRow()
-p6 = win.addPlot(colspan=2, title='USX/USY')
+p6 = win.addPlot(colspan=2)
 p6.addLegend()
 p6.setLabel('bottom', 'Time', 's')
 p6.setXRange(-10, 0)
-p6.setYRange(0, 0.1)
+#p6.setYRange(0, 0.1)
+p6.setYRange(-1000, 1000)
+
 
 p3 = win.addPlot(colspan=1, title="Touch resistance")
 p3.setXRange(0, 65535)
@@ -179,8 +183,11 @@ charts = [
     Chunked(p5, 'RX', pen=(255, 0, 0)),
     Chunked(p5, 'RY', pen=(0, 255, 0)),
 
-    Chunked(p6, 'USX', pen=(255, 0, 0)),
-    Chunked(p6, 'USY', pen=(0, 255, 0)),
+    #Chunked(p6, 'USX', pen=(255, 0, 0)),
+    #Chunked(p6, 'USY', pen=(0, 255, 0)),
+
+    Chunked(p6, 'vx', pen=(255, 0, 0)),
+    Chunked(p6, 'vy', pen=(0, 255, 0)),
 
     Touch(p3),
 
@@ -198,8 +205,10 @@ def update():
     mapper = {
         'USX': float,
         'USY': float,
+        'vx': float,
+        'vy': float,
         'RX': int,
-        'RY': int
+        'RY': int,
     }
 
     if not all([k in row.keys() for k in mapper.keys()]):

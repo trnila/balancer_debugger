@@ -86,11 +86,16 @@ class ControlWidget(QDialog, Ui_ControlForm):
         self.const_k.valueChanged.connect(self.send_cmd("set_k"))
         self.pauseBtn.clicked.connect(self.pause)
         self.enableServos.clicked.connect(self.send_cmd("enable_servos"))
+        self.cmd.returnPressed.connect(self.prepare_cmd)
 
     def send_cmd(self, cmd):
         def fn(*args):
             self.serial.send_cmd(cmd, *args)
         return fn
+
+    def prepare_cmd(self):
+        args = self.cmd.text().split(' ')
+        self.serial.send_cmd(*args)
 
     def pause(self, pause):
         self.serial.pause = pause

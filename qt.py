@@ -138,6 +138,20 @@ class Input:
 
         self.serial.timeout = None
 
+
+def plot(keys, yrange, colspan):
+    pens = [(255, 0, 0), (0, 255, 0)]
+
+    p6 = win.addPlot(colspan=colspan)
+    p6.addLegend()
+    p6.setLabel('bottom', 'Time', 's')
+    p6.setXRange(-10, 0)
+    # p6.setYRange(0, 0.1)
+    p6.setYRange(*yrange)
+
+    for i, key in enumerate(keys):
+        charts.append(Chunked(p6, key, pen=pens[i]))
+
 logging.getLogger().setLevel(logging.DEBUG)
 
 parser = argparse.ArgumentParser()
@@ -150,22 +164,15 @@ app = QtGui.QApplication([])
 w = QtGui.QWidget()
 
 win = pg.MultiPlotWidget()
+charts = []
 
 win.nextRow()
-p5 = win.addPlot(colspan=3, title='Resistance')
-p5.addLegend()
-p5.setLabel('bottom', 'Time', 's')
-p5.setXRange(-10, 0)
-p5.setYRange(0, 65535)
+charts.append(plot(['RX', 'RY'], [0, 65535], colspan=2))
+#charts.append(plot(['USX', 'USY'], [0, 0.1], colspan=2))
+charts.append(plot(['nx', 'ny'], [-1, 1], colspan=2))
 
 win.nextRow()
-p6 = win.addPlot(colspan=2)
-p6.addLegend()
-p6.setLabel('bottom', 'Time', 's')
-p6.setXRange(-10, 0)
-#p6.setYRange(0, 0.1)
-p6.setYRange(-1000, 1000)
-
+charts.append(plot(['vx', 'vy'], [-1000, 1000], colspan=2))
 
 p3 = win.addPlot(colspan=1, title="Touch resistance")
 p3.setXRange(0, 65535)
@@ -179,20 +186,7 @@ w.setLayout(layout)
 layout.addWidget(win)
 layout.addWidget(control)
 
-charts = [
-    Chunked(p5, 'RX', pen=(255, 0, 0)),
-    Chunked(p5, 'RY', pen=(0, 255, 0)),
-
-    #Chunked(p6, 'USX', pen=(255, 0, 0)),
-    #Chunked(p6, 'USY', pen=(0, 255, 0)),
-
-    Chunked(p6, 'vx', pen=(255, 0, 0)),
-    Chunked(p6, 'vy', pen=(0, 255, 0)),
-
-    Touch(p3),
-
-    control
-]
+charts.append(Touch(p3))
 
 
 def update():
@@ -207,6 +201,8 @@ def update():
         'USY': float,
         'vx': float,
         'vy': float,
+        'nx': float,
+        'ny': float,
         'RX': int,
         'RY': int,
     }

@@ -1,7 +1,28 @@
+import logging
 import threading
+from collections import deque
 from queue import Queue
 
 from serial import Serial
+
+
+class RunningAverage:
+    def __init__(self, keep_last=10):
+        self.last = deque()
+        self.size = keep_last
+
+    def add(self, val):
+        self.last.append(val)
+
+        if len(self.last) > self.size:
+            self.last.popleft()
+
+    def avg(self):
+        return sum(self.last) / len(self.last)
+
+    def median(self):
+        items = sorted(self.last)
+        return self.last[int(len(items) / 2)]
 
 
 class Input:
@@ -11,6 +32,8 @@ class Input:
         self.measurements = Queue()
         self.thread = threading.Thread(target=self._do_start)
         self.thread.daemon = True
+
+        self.measures_keys_avg = RunningAverage()
 
     def send_cmd(self, cmd, *arguments):
         def mapper(s):
@@ -41,6 +64,11 @@ class Input:
         while True:
             line = self._readline()
             row = dict([i.split('=', 2) for i in line.split(' ') if len(i.split('=', 2)) == 2])
+
+            self.measures_keys_avg.add(len(row.keys()))
+            if self.measures_keys_avg.median() != len(row.keys()):
+                logging.debug("Dropped measurement", row)
+                continue
 
             self.measurements.put(row)
 

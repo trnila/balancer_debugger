@@ -63,7 +63,11 @@ class Input:
         self._flush_input()
         while True:
             line = self._readline()
-            row = dict([i.split('=', 2) for i in line.split(' ') if len(i.split('=', 2)) == 2])
+
+            def fix(pair):
+                return pair[0], float(pair[1])
+
+            row = dict([fix(i.split('=', 2)) for i in line.split(' ') if len(i.split('=', 2)) == 2])
 
             self.measures_keys_avg.add(len(row.keys()))
             if self.measures_keys_avg.median() != len(row.keys()):

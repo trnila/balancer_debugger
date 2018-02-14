@@ -160,18 +160,62 @@ class Input:
 
         self.serial.timeout = None
 
-def plot(keys, yrange, colspan, title):
-    pens = [(255, 0, 0), (0, 255, 0)]
+class App:
+    def __init__(self, args):
+        self.serial = Input(Serial(args.serial, args.baudrate))
 
-    p6 = win.addPlot(colspan=colspan, title=title)
-    p6.addLegend()
-    p6.setLabel('bottom', 'Time', 's')
-    p6.setXRange(-10, 0)
-    # p6.setYRange(0, 0.1)
-    p6.setYRange(*yrange)
+        self.timer = pg.QtCore.QTimer()
+        self.timer.timeout.connect(self.update_charts)
+        self.charts = []
 
-    for i, key in enumerate(keys):
-        charts.append(Chunked(p6, key, pen=pens[i]))
+        self.app = QtGui.QApplication([])
+        self.w = QtGui.QWidget()
+        self.win = pg.MultiPlotWidget()
+
+    def next_row(self):
+        self.win.nextRow()
+
+    def start(self):
+        self.serial.start()
+
+        setup_charts(self)
+
+        control = ControlWidget(self.serial)
+
+        layout = QtGui.QGridLayout()
+        self.w.setLayout(layout)
+        layout.addWidget(self.win)
+        layout.addWidget(control)
+
+        self.timer.start(20)
+
+        self.w.show()
+        self.app.exec_()
+
+    def update_charts(self):
+        line = self.serial.get_available(1)
+        if self.serial.pause or len(line) <= 0:
+            return
+
+        for row in line:
+            for chart in self.charts:
+                try:
+                    chart.update(row)
+                except Exception as e:
+                    logging.exception(e)
+
+    def plot(self, keys, yrange, colspan, title):
+        pens = [(255, 0, 0), (0, 255, 0)]
+
+        p6 = self.win.addPlot(colspan=colspan, title=title)
+        p6.addLegend()
+        p6.setLabel('bottom', 'Time', 's')
+        p6.setXRange(-10, 0)
+        p6.setYRange(*yrange)
+
+        for i, key in enumerate(keys):
+            self.charts.append(Chunked(p6, key, pen=pens[i]))
+
 
 logging.getLogger().setLevel(logging.DEBUG)
 
@@ -181,53 +225,22 @@ parser.add_argument('--baudrate', default=115200)
 args = parser.parse_args()
 
 
-app = QtGui.QApplication([])
-w = QtGui.QWidget()
+def setup_charts(app):
+    app.next_row()
+    #plot(['RX', 'RY'], [0, 65535], colspan=2)
+    #plot(['USX', 'USY'], [0, 0.1], colspan=2)
+    app.plot(['nx', 'ny'], [-1, 1], colspan=2, title='normal')
+    app.plot(['vx', 'vy'], [-1000, 1000], colspan=2, title='speed')
 
-win = pg.MultiPlotWidget()
-charts = []
+    app.next_row()
+    app.plot(['nsx', 'nsy'], [-1, 1], colspan=2, title='normalized speed')
 
-win.nextRow()
-#plot(['RX', 'RY'], [0, 65535], colspan=2)
-#plot(['USX', 'USY'], [0, 0.1], colspan=2)
-plot(['nx', 'ny'], [-1, 1], colspan=2, title='normal')
-plot(['vx', 'vy'], [-1000, 1000], colspan=2, title='speed')
+    p3 = app.win.addPlot(colspan=1, title="Touch resistance")
+    p3.setXRange(0, 65535)
+    p3.setYRange(0, 65535)
 
-win.nextRow()
-plot(['nsx', 'nsy'], [-1, 1], colspan=2, title='normalized speed')
-
-p3 = win.addPlot(colspan=1, title="Touch resistance")
-p3.setXRange(0, 65535)
-p3.setYRange(0, 65535)
-
-serial = Input(Serial(args.serial, args.baudrate))
-serial.start()
-control = ControlWidget(serial)
-
-layout = QtGui.QGridLayout()
-w.setLayout(layout)
-layout.addWidget(win)
-layout.addWidget(control)
-
-charts.append(Touch(p3))
+    app.charts.append(Touch(p3))
 
 
-def update():
-    line = serial.get_available(1)
-    if serial.pause or len(line) <= 0:
-        return
-
-    for row in line:
-        for chart in charts:
-            try:
-                chart.update(row)
-            except Exception as e:
-                logging.exception(e)
-
-
-timer = pg.QtCore.QTimer()
-timer.timeout.connect(update)
-timer.start(50)
-
-w.show()
-app.exec_()
+app = App(args)
+app.start()

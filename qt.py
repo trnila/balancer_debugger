@@ -1,5 +1,7 @@
 import argparse
+import threading
 from collections import deque
+from queue import Queue
 
 from serial import Serial
 from ui_control import Ui_ControlForm
@@ -108,7 +110,9 @@ class Input:
     def __init__(self, serial):
         self.serial: Serial = serial
         self.pause = False
-        self.flush_input()
+        self.measurements = Queue()
+        self.thread = threading.Thread(target=self._do_start)
+        self.thread.daemon = True
 
     def send_cmd(self, cmd, *arguments):
         def mapper(s):
@@ -123,12 +127,30 @@ class Input:
         print(text)
         self.serial.write((text + "\n").encode())
 
-    def readline(self):
+    def start(self):
+        self.thread.start()
+
+    def get_available(self, max_measures=10):
+        measurements = []
+        while not self.measurements.empty() and max_measures > 0:
+            measurements.append(self.measurements.get())
+            max_measures -= 1
+
+        return measurements
+
+    def _do_start(self):
+        self._flush_input()
+        while True:
+            line = self._readline()
+            row = dict([i.split('=', 2) for i in line.split(' ') if len(i.split('=', 2)) == 2])
+
+            self.measurements.put(row)
+
+    def _readline(self):
         line = self.serial.readline().decode().strip()
-        #print(line)
         return line
 
-    def flush_input(self):
+    def _flush_input(self):
         self.serial.timeout = 0.005
         while self.serial.readline():
             pass
@@ -137,7 +159,6 @@ class Input:
             self.serial.readline()
 
         self.serial.timeout = None
-
 
 def plot(keys, yrange, colspan, title):
     pens = [(255, 0, 0), (0, 255, 0)]
@@ -167,19 +188,20 @@ win = pg.MultiPlotWidget()
 charts = []
 
 win.nextRow()
-#charts.append(plot(['RX', 'RY'], [0, 65535], colspan=2))
-#charts.append(plot(['USX', 'USY'], [0, 0.1], colspan=2))
-charts.append(plot(['nx', 'ny'], [-1, 1], colspan=2, title='normal'))
-charts.append(plot(['vx', 'vy'], [-1000, 1000], colspan=2, title='speed'))
+#plot(['RX', 'RY'], [0, 65535], colspan=2)
+#plot(['USX', 'USY'], [0, 0.1], colspan=2)
+plot(['nx', 'ny'], [-1, 1], colspan=2, title='normal')
+plot(['vx', 'vy'], [-1000, 1000], colspan=2, title='speed')
 
 win.nextRow()
-charts.append(plot(['nsx', 'nsy'], [-1, 1], colspan=2, title='normalized speed'))
+plot(['nsx', 'nsy'], [-1, 1], colspan=2, title='normalized speed')
 
 p3 = win.addPlot(colspan=1, title="Touch resistance")
 p3.setXRange(0, 65535)
 p3.setYRange(0, 65535)
 
 serial = Input(Serial(args.serial, args.baudrate))
+serial.start()
 control = ControlWidget(serial)
 
 layout = QtGui.QGridLayout()
@@ -191,21 +213,21 @@ charts.append(Touch(p3))
 
 
 def update():
-    line = serial.readline()
-    if serial.pause:
+    line = serial.get_available(1)
+    if serial.pause or len(line) <= 0:
         return
 
-    row = dict([i.split('=', 2) for i in line.split(' ') if len(i.split('=', 2)) == 2])
-    for chart in charts:
-        try:
-            chart.update(row)
-        except Exception as e:
-            logging.exception(e)
+    for row in line:
+        for chart in charts:
+            try:
+                chart.update(row)
+            except Exception as e:
+                logging.exception(e)
 
 
 timer = pg.QtCore.QTimer()
 timer.timeout.connect(update)
-timer.start(0)
+timer.start(50)
 
 w.show()
 app.exec_()

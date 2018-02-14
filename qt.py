@@ -60,7 +60,6 @@ class App:
 
         p6 = self.win.addPlot(colspan=colspan, title=title)
         p6.addLegend()
-        p6.setLabel('bottom', 'Time', 's')
         p6.setXRange(-10, 0)
         p6.setYRange(*yrange)
 

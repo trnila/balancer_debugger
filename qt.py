@@ -139,10 +139,10 @@ class Input:
         self.serial.timeout = None
 
 
-def plot(keys, yrange, colspan):
+def plot(keys, yrange, colspan, title):
     pens = [(255, 0, 0), (0, 255, 0)]
 
-    p6 = win.addPlot(colspan=colspan)
+    p6 = win.addPlot(colspan=colspan, title=title)
     p6.addLegend()
     p6.setLabel('bottom', 'Time', 's')
     p6.setXRange(-10, 0)
@@ -167,12 +167,13 @@ win = pg.MultiPlotWidget()
 charts = []
 
 win.nextRow()
-charts.append(plot(['RX', 'RY'], [0, 65535], colspan=2))
+#charts.append(plot(['RX', 'RY'], [0, 65535], colspan=2))
 #charts.append(plot(['USX', 'USY'], [0, 0.1], colspan=2))
-charts.append(plot(['nx', 'ny'], [-1, 1], colspan=2))
+charts.append(plot(['nx', 'ny'], [-1, 1], colspan=2, title='normal'))
+charts.append(plot(['vx', 'vy'], [-1000, 1000], colspan=2, title='speed'))
 
 win.nextRow()
-charts.append(plot(['vx', 'vy'], [-1000, 1000], colspan=2))
+charts.append(plot(['nsx', 'nsy'], [-1, 1], colspan=2, title='normalized speed'))
 
 p3 = win.addPlot(colspan=1, title="Touch resistance")
 p3.setXRange(0, 65535)
@@ -195,25 +196,6 @@ def update():
         return
 
     row = dict([i.split('=', 2) for i in line.split(' ') if len(i.split('=', 2)) == 2])
-
-    mapper = {
-        'USX': float,
-        'USY': float,
-        'vx': float,
-        'vy': float,
-        'nx': float,
-        'ny': float,
-        'RX': int,
-        'RY': int,
-    }
-
-    if not all([k in row.keys() for k in mapper.keys()]):
-        logging.debug("not all keys available")
-        return
-
-    for k, v in mapper.items():
-        row[k] = v(row[k])
-
     for chart in charts:
         try:
             chart.update(row)

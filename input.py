@@ -6,6 +6,14 @@ from queue import Queue
 from serial import Serial
 
 
+def parse_line(line):
+    def fix(pair):
+        return pair[0], float(pair[1])
+
+    row = dict([fix(i.split('=', 2)) for i in line.split(' ') if len(i.split('=', 2)) == 2])
+    return row
+
+
 class RunningAverage:
     def __init__(self, keep_last=10):
         self.last = deque()
@@ -64,10 +72,7 @@ class Input:
         while True:
             line = self._readline()
 
-            def fix(pair):
-                return pair[0], float(pair[1])
-
-            row = dict([fix(i.split('=', 2)) for i in line.split(' ') if len(i.split('=', 2)) == 2])
+            row = parse_line(line)
 
             self.measures_keys_avg.add(len(row.keys()))
             if self.measures_keys_avg.median() != len(row.keys()):

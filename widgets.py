@@ -6,6 +6,8 @@ from ui_control import Ui_ControlForm
 import pyqtgraph as pg
 import numpy as np
 
+from ipython import ConsoleWidget
+
 
 class Chunked:
     def __init__(self, plot, key, **kwargs):
@@ -77,6 +79,9 @@ class ControlWidget(QDialog, Ui_ControlForm):
         super(QDialog, self).__init__()
         self.serial = input
         self.setupUi(self)
+
+        self.console = ConsoleWidget()
+        self.jupyter_console.layout().addWidget(self.console)
 
         self.mode.currentTextChanged.connect(self.send_cmd("mode"))
         self.const_p.valueChanged.connect(self.send_cmd("set_p"))

@@ -13,123 +13,141 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="cmd"/>
-     </item>
-     <item>
-      <widget class="QLabel" name="current">
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="enableServos">
-       <property name="text">
-        <string>Enable servos</string>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pauseBtn">
-       <property name="text">
-        <string>Pause</string>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QFormLayout" name="formLayout">
-     <item row="0" column="0">
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>mode</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QComboBox" name="mode">
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QSplitter" name="splitter">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <widget class="QWidget" name="charts" native="true">
+      <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
-        <property name="text">
-         <string>balance</string>
-        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_3"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="widget" native="true">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="cmd"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="current">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="enableServos">
+           <property name="text">
+            <string>Enable servos</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pauseBtn">
+           <property name="text">
+            <string>Pause</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
-        <property name="text">
-         <string>stop</string>
-        </property>
+        <layout class="QFormLayout" name="formLayout">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>mode</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QComboBox" name="mode">
+           <item>
+            <property name="text">
+             <string>balance</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>stop</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>demo</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>p</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>k</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QDoubleSpinBox" name="const_p">
+           <property name="decimals">
+            <number>8</number>
+           </property>
+           <property name="minimum">
+            <double>-1000000000000000000.000000000000000</double>
+           </property>
+           <property name="value">
+            <double>0.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QDoubleSpinBox" name="const_k">
+           <property name="decimals">
+            <number>8</number>
+           </property>
+           <property name="minimum">
+            <double>-1000000000000000000.000000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>10000000000000000000.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
-       <item>
-        <property name="text">
-         <string>demo</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>p</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>k</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QDoubleSpinBox" name="const_p">
-       <property name="decimals">
-        <number>8</number>
-       </property>
-       <property name="minimum">
-        <double>-1000000000000000000.000000000000000</double>
-       </property>
-       <property name="value">
-        <double>0.000000000000000</double>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QDoubleSpinBox" name="const_k">
-       <property name="decimals">
-        <number>8</number>
-       </property>
-       <property name="minimum">
-        <double>-1000000000000000000.000000000000000</double>
-       </property>
-       <property name="maximum">
-        <double>10000000000000000000.000000000000000</double>
-       </property>
-      </widget>
-     </item>
-    </layout>
+      </layout>
+     </widget>
+    </widget>
    </item>
   </layout>
  </widget>

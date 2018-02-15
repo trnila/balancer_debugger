@@ -32,14 +32,10 @@ class App:
         setup_charts(self)
 
         control = ControlWidget(self.serial)
-
-        layout = QGridLayout()
-        self.w.setLayout(layout)
-        layout.addWidget(self.win)
-        layout.addWidget(control)
+        control.charts.layout().addWidget(self.win)
 
         self.timer.start(20)
-
+        self.w.setLayout(control.layout())
         self.w.show()
         self.app.exec_()
 

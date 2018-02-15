@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QDialog
 from ui_control import Ui_ControlForm
 import pyqtgraph as pg
 import numpy as np
+import pandas as pd
 
 from ipython import ConsoleWidget
 
@@ -75,12 +76,18 @@ class Touch:
 
 
 class ControlWidget(QDialog, Ui_ControlForm):
-    def __init__(self, input):
+    def __init__(self, app):
         super(QDialog, self).__init__()
-        self.serial = input
+        self.serial = app.serial
         self.setupUi(self)
 
-        self.console = ConsoleWidget()
+        self.console = ConsoleWidget(customBanner='prepare() - returns pandas\n')
+        self.console.push_vars({
+            'serial': self.serial,
+            'prepare': lambda: pd.DataFrame(self.serial.measured)}
+        )
+        self.console.execute_command("import pandas as pd")
+        self.console.execute_command('%matplotlib inline')
         self.jupyter_console.layout().addWidget(self.console)
 
         self.mode.currentTextChanged.connect(self.send_cmd("mode"))

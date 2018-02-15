@@ -40,6 +40,7 @@ class Input:
         self.measurements = Queue()
         self.thread = threading.Thread(target=self._do_start)
         self.thread.daemon = True
+        self.measured = []
 
         self.measures_keys_avg = RunningAverage()
 
@@ -80,6 +81,7 @@ class Input:
                 continue
 
             self.measurements.put(row)
+            self.measured.append(row)
 
     def _readline(self):
         line = self.serial.readline().decode().strip()

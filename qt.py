@@ -31,7 +31,7 @@ class App:
 
         setup_charts(self)
 
-        control = ControlWidget(self.serial)
+        control = ControlWidget(self)
         control.charts.layout().addWidget(self.win)
 
         self.timer.start(20)

@@ -11,12 +11,14 @@ import pyqtgraph.opengl as gl
 
 from ipython import ConsoleWidget
 
+
 def normalize(v):
     l = np.linalg.norm(v)
 
     if l == 0:
         return v
     return v / l
+
 
 class Chunked:
     def __init__(self, plot, key, **kwargs):
@@ -41,7 +43,7 @@ class Chunked:
         if i == 0:
             kwargs = {**self.kwargs}
 
-            if self.chunk == 0:
+            if self.chunk % 10 == 0:
                 kwargs['name'] = self.key
 
             curve = self.plot.plot(**kwargs)

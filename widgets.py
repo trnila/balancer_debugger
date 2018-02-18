@@ -163,7 +163,6 @@ class PlaneWidget(gl.GLViewWidget):
 
     def new_measurement(self, row):
         self.normal = np.array([row['nx'], row['ny'], 1])
-        print(self.normal)
         #self.normal += self.speed()
         #self.normal = normalize(self.normal)
 

@@ -4,7 +4,6 @@ import sys
 
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QApplication, QWidget, QGridLayout
-from serial import Serial
 
 from input import Input
 import logging

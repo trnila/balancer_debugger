@@ -40,13 +40,6 @@ def null_processor(row):
     return row
 
 
-def fixer(row):
-    if 'nx' in row and 'ny' in row:
-        row['nx'] = row['nsx'] * 100
-        row['ny'] = row['nsy'] * 100
-    return row
-
-
 class Fixer:
     def __init__(self):
         self.keys = ['RX', 'RY']

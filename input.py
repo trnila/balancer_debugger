@@ -1,9 +1,10 @@
 import logging
 import threading
+import time
 from collections import deque
 from queue import Queue
 
-from serial import Serial
+from serial import Serial, SerialException
 
 
 def parse_line(line):
@@ -34,8 +35,8 @@ class RunningAverage:
 
 
 class Input:
-    def __init__(self, serial):
-        self.serial: Serial = serial
+    def __init__(self, device, baud):
+        self.serial: Serial = Serial(device, baudrate=baud)
         self.pause = False
         self.measurements = Queue()
         self.thread = threading.Thread(target=self._do_start)
@@ -70,18 +71,35 @@ class Input:
 
     def _do_start(self):
         self._flush_input()
+        try:
+            while True:
+                line = self._readline()
+                row = parse_line(line)
+
+                self.measures_keys_avg.add(len(row.keys()))
+                if self.measures_keys_avg.median() != len(row.keys()):
+                    logging.debug("Dropped measurement", row)
+                    continue
+
+                self.measurements.put(row)
+                self.measured.append(row)
+        except Exception as e:
+            logging.exception(e)
+            self._reopen()
+
+    def _reopen(self):
+        self.serial.close()
+        time.sleep(0.5)
+
         while True:
-            line = self._readline()
+            print('.')
+            try:
+                self.serial.open()
+                return
+            except:
+                print('err')
 
-            row = parse_line(line)
-
-            self.measures_keys_avg.add(len(row.keys()))
-            if self.measures_keys_avg.median() != len(row.keys()):
-                logging.debug("Dropped measurement", row)
-                continue
-
-            self.measurements.put(row)
-            self.measured.append(row)
+            time.sleep(0.5)
 
     def _readline(self):
         line = self.serial.readline().decode().strip()

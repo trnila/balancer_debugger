@@ -13,7 +13,7 @@ from widgets import *
 
 class App:
     def __init__(self, args):
-        self.serial = Input(Serial(args.serial, args.baudrate))
+        self.serial = Input(args.serial, args.baudrate)
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_charts)

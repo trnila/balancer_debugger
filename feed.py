@@ -1,13 +1,16 @@
+import errno
 import logging
 
 import serial
 import time
 import random
 import sys
+from subprocess import Popen
+import argparse
 
-ser = serial.Serial('/dev/pts/9')
-
-rand = len(sys.argv) != 2
+SERIAL_WRITER = '/tmp/ball_balancer.device'
+SERIAL_READER = '/tmp/ball_balancer.client'
+CONNECT_TRIES = 10
 
 
 def from_file(file_name):
@@ -67,16 +70,38 @@ class Fixer:
         return row
 
 
-iter = from_rand() if len(sys.argv) != 2 else from_file(sys.argv[1])
-#processor = null_processor
-processor = fixer
-#processor = Fixer().process
+p = Popen([
+    "socat",
+    "pty,raw,echo=0,link={}".format(SERIAL_WRITER),
+    "pty,raw,echo=0,link={}".format(SERIAL_READER)
+])
 
+for i in range(0, CONNECT_TRIES):
+    try:
+        ser = serial.Serial(SERIAL_WRITER)
+        break
+    except serial.SerialException as e:
+        if e.errno == errno.ENOENT:
+            time.sleep(0.1)
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--print', '-p', help='print each line to stdout', action='store_true')
+parser.add_argument('--file', '-f', help='input file with captured data')
+parser.add_argument('--processor', help='path to processor script, script must contain process(row) function')
+
+args = parser.parse_args()
+
+iter = from_rand() if not args.file else from_file(args.file)
+processor = null_processor
+if args.processor:
+    with open("processors/test.py") as f:
+        exec(f.read())
 
 for row in iter:
     row = processor(row)
     line = " ".join(["{}={}".format(k, row[k]) for k in row.keys()])
-    print(line, flush=True)
-    ser.write((line + "\n").encode())
+    if args.print:
+        print(line, flush=True)
+    ser.write((line + "\r\n").encode())
     ser.flushOutput()
     time.sleep(0.02)

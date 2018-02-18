@@ -46,6 +46,7 @@ p = Popen([
     "pty,raw,echo=0,link={}".format(SERIAL_READER)
 ])
 
+
 @atexit.register
 def terminate_socat():
     p.terminate()

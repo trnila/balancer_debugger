@@ -4,9 +4,9 @@ import logging
 import serial
 import time
 import random
-import sys
 from subprocess import Popen
 import argparse
+import atexit
 
 SERIAL_WRITER = '/tmp/ball_balancer.device'
 SERIAL_READER = '/tmp/ball_balancer.client'
@@ -40,34 +40,16 @@ def null_processor(row):
     return row
 
 
-class Fixer:
-    def __init__(self):
-        self.keys = ['RX', 'RY']
-        self.prev = dict([(i, 0) for i in self.keys])
-        self.speed = dict([(i, 0) for i in self.keys])
-        self.fails = 0
-
-    def process(self, row):
-        for i in self.keys:
-            v = row[i]
-            if v > 60000:
-                v = self.prev[i] + self.speed[i]
-                self.fails += 1
-                if self.fails > 20:
-                    v = 65000
-            else:
-                self.fails = 0
-            self.speed[i] = v - self.prev[i]
-
-            row[i] = v
-        return row
-
-
 p = Popen([
     "socat",
     "pty,raw,echo=0,link={}".format(SERIAL_WRITER),
     "pty,raw,echo=0,link={}".format(SERIAL_READER)
 ])
+
+@atexit.register
+def terminate_socat():
+    p.terminate()
+
 
 for i in range(0, CONNECT_TRIES):
     try:

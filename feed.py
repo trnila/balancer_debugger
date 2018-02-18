@@ -1,9 +1,11 @@
+import logging
+
 import serial
 import time
 import random
 import sys
 
-ser = serial.Serial('/dev/pts/4')
+ser = serial.Serial('/dev/pts/9')
 
 rand = len(sys.argv) != 2
 
@@ -11,19 +13,14 @@ rand = len(sys.argv) != 2
 def from_file(file_name):
     lines = list(open(file_name))
 
-    fixers = {
-        'RX': int,
-        'RY': int
-    }
-
     while True:
         for line in lines:
-            row = dict(i.split('=', 2) for i in line.strip().split(' '))
-
-            for k, fixer in fixers.items():
-                row[k] = fixer(row[k])
-
-            yield row
+            def fix(v):
+                return v[0], float(v[1])
+            try:
+                yield dict(fix(i.split('=', 2)) for i in line.strip().split(' '))
+            except BaseException as e:
+                logging.exception(e)
 
 
 def from_rand():
@@ -38,6 +35,14 @@ def from_rand():
 
 def null_processor(row):
     return row
+
+
+def fixer(row):
+    if 'nx' in row and 'ny' in row:
+        row['nx'] = row['nsx'] * 100
+        row['ny'] = row['nsy'] * 100
+    return row
+
 
 class Fixer:
     def __init__(self):
@@ -64,13 +69,14 @@ class Fixer:
 
 iter = from_rand() if len(sys.argv) != 2 else from_file(sys.argv[1])
 #processor = null_processor
-processor = Fixer().process
+processor = fixer
+#processor = Fixer().process
 
 
 for row in iter:
     row = processor(row)
     line = " ".join(["{}={}".format(k, row[k]) for k in row.keys()])
-    #print(line, flush=True)
+    print(line, flush=True)
     ser.write((line + "\n").encode())
     ser.flushOutput()
     time.sleep(0.02)

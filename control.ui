@@ -28,7 +28,7 @@
      </widget>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="jupyter_console">
        <attribute name="title">
@@ -52,7 +52,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tabWidgetPage1" native="true">
+      <widget class="QWidget" name="tabWidgetPage1">
        <attribute name="title">
         <string>Parameters</string>
        </attribute>
@@ -175,6 +175,12 @@
          </layout>
         </item>
        </layout>
+      </widget>
+      <widget class="QWidget" name="plane">
+       <attribute name="title">
+        <string>Plate</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_6"/>
       </widget>
      </widget>
     </widget>

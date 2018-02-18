@@ -1,4 +1,5 @@
 import argparse
+import sys
 
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QApplication, QWidget, QGridLayout
@@ -33,6 +34,7 @@ class App:
 
         control = ControlWidget(self)
         control.charts.layout().addWidget(self.win)
+        self.charts.append(control)
 
         self.timer.start(20)
         self.w.setLayout(control.layout())
@@ -47,9 +49,9 @@ class App:
         for row in line:
             for chart in self.charts:
                 try:
-                    chart.update(row)
-                except Exception as e:
-                    logging.exception(e)
+                    chart.new_measurement(row)
+                except:
+                    logging.exception(sys.exc_info()[0])
 
     def plot(self, keys, yrange, colspan, title):
         pens = [(255, 0, 0), (0, 255, 0)]

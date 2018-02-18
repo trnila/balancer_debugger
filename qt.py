@@ -1,4 +1,5 @@
 import argparse
+import signal
 import sys
 
 from PyQt5.QtCore import QTimer
@@ -39,6 +40,8 @@ class App:
         self.timer.start(20)
         self.w.setLayout(control.layout())
         self.w.show()
+
+        signal.signal(signal.SIGINT, signal.SIG_DFL)
         self.app.exec_()
 
     def update_charts(self):

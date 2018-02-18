@@ -71,8 +71,8 @@ class Input:
 
     def _do_start(self):
         self._flush_input()
-        try:
-            while True:
+        while True:
+            try:
                 line = self._readline()
                 row = parse_line(line)
 
@@ -83,21 +83,20 @@ class Input:
 
                 self.measurements.put(row)
                 self.measured.append(row)
-        except Exception as e:
-            logging.exception(e)
-            self._reopen()
+            except Exception as e:
+                logging.exception(e)
+                self._reopen()
 
     def _reopen(self):
         self.serial.close()
         time.sleep(0.5)
 
         while True:
-            print('.')
             try:
                 self.serial.open()
                 return
-            except:
-                print('err')
+            except BaseException as e:
+                logging.exception(e)
 
             time.sleep(0.5)
 

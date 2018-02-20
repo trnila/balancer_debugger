@@ -36,7 +36,7 @@ class RunningAverage:
 
 class Input:
     def __init__(self, device, baud):
-        self.serial: Serial = Serial(device, baudrate=baud)
+        self.serial = Serial(device, baudrate=baud)
         self.pause = False
         self.measurements = Queue()
         self.thread = threading.Thread(target=self._do_start)

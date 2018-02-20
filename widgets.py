@@ -158,24 +158,28 @@ class PlaneWidget(gl.GLViewWidget):
 
         self.plt = gl.GLSurfacePlotItem(x=self.x, y=self.y, z=self.z)
         self.addItem(self.plt)
+        self.i = 0
 
     def speed(self):
         return [0.01, 0.01, 0]
         return [random.randint(-1000, 1000), random.randint(-1000, 1000), 0]
 
     def new_measurement(self, row):
-        self.normal = np.array([row['nx'], row['ny'], 1])
-        #self.normal += self.speed()
-        #self.normal = normalize(self.normal)
+        return
+        self.i += 1
+        if self.i % 20 == 0:
+            self.normal = np.array([row['nx'], row['ny'], 1])
+            #self.normal += self.speed()
+            #self.normal = normalize(self.normal)
 
-        #d = np.dot(-point, normal)
-        d = 0
+            #d = np.dot(-point, normal)
+            d = 0
 
-        normal = self.normal
-        for xx, xxval in enumerate(self.x):
-            for yy, yyval in enumerate(self.y):
-                self.z[xx, yy] = (-normal[0] * xxval - normal[1] * yyval - d) / normal[2]
+            normal = self.normal
+            for xx, xxval in enumerate(self.x):
+                for yy, yyval in enumerate(self.y):
+                    self.z[xx, yy] = (-normal[0] * xxval - normal[1] * yyval - d) / normal[2]
 
-        self.plt.setData(x=self.x, y=self.y, z=self.z)
+            self.plt.setData(x=self.x, y=self.y, z=self.z)
 
 

@@ -66,8 +66,9 @@ class Chunked:
 
 
 class Touch:
-    def __init__(self, plot, lastPoints=50):
+    def __init__(self, plot, keys, lastPoints=50):
         self.plot = plot
+        self.keys = keys
         self.lastPoints = lastPoints
         self.x = deque()
         self.y = deque()
@@ -75,8 +76,8 @@ class Touch:
         self.i = 0
 
     def new_measurement(self, row):
-        self.x.append(row['RX'])
-        self.y.append(row['RY'])
+        self.x.append(row[self.keys[0]])
+        self.y.append(row[self.keys[1]])
         self.curve.setData(self.x, self.y)
         self.i += 1
 

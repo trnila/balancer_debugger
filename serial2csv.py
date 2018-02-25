@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+import logging
 import sys
 
 from input import parse_line
@@ -12,8 +12,11 @@ lines = []
 
 with open(sys.argv[1]) as f:
     for line in f:
-        d = parse_line(line)
-        lines.append(d)
+        try:
+            d = parse_line(line)
+            lines.append(d)
+        except Exception as e:
+            logging.exception(e)
 
 key_sizes = sorted([len(i) for i in lines])
 required_size = key_sizes[int(len(key_sizes) / 2)]

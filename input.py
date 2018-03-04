@@ -1,4 +1,5 @@
 import logging
+import sys
 import threading
 import time
 from collections import deque
@@ -34,42 +35,12 @@ class RunningAverage:
         return self.last[int(len(items) / 2)]
 
 
-class Input:
+class SerialSource:
     def __init__(self, device, baud):
         self.serial = Serial(device, baudrate=baud)
-        self.pause = False
-        self.measurements = Queue()
-        self.thread = threading.Thread(target=self._do_start)
-        self.thread.daemon = True
-        self.measured = []
-
         self.measures_keys_avg = RunningAverage()
 
-    def send_cmd(self, cmd, *arguments):
-        def mapper(s):
-            if type(s) == bool:
-                s = 1 if s else 0
-            elif type(s) == float:
-                return format(s, '.10f')
-
-            return str(s)
-
-        text = " ".join([cmd] + list(map(mapper, arguments)))
-        print(text)
-        self.serial.write((text + "\n").encode())
-
-    def start(self):
-        self.thread.start()
-
-    def get_available(self, max_measures=10):
-        measurements = []
-        while not self.measurements.empty() and max_measures > 0:
-            measurements.append(self.measurements.get())
-            max_measures -= 1
-
-        return measurements
-
-    def _do_start(self):
+    def handle_lines(self, announce):
         self._flush_input()
         while True:
             try:
@@ -81,11 +52,13 @@ class Input:
                     logging.debug("Dropped measurement", row)
                     continue
 
-                self.measurements.put(row)
-                self.measured.append(row)
+                announce(row)
             except Exception as e:
                 logging.exception(e)
                 self._reopen()
+
+    def write(self, text):
+        self.serial.write(text.encode())
 
     def _reopen(self):
         self.serial.close()
@@ -101,8 +74,7 @@ class Input:
             time.sleep(0.5)
 
     def _readline(self):
-        line = self.serial.readline().decode().strip()
-        return line
+        return self.serial.readline().decode().strip()
 
     def _flush_input(self):
         self.serial.timeout = 0.005
@@ -113,3 +85,61 @@ class Input:
             self.serial.readline()
 
         self.serial.timeout = None
+
+
+class StreamSource:
+    def __init__(self, source):
+        self.source = source
+
+    def handle_lines(self, announce):
+        while True:
+            try:
+                line = self.source.readline()
+                row = parse_line(line)
+
+                announce(row)
+            except Exception as e:
+                logging.exception(e)
+
+    def write(self):
+        raise NotImplementedError()
+
+
+class Input:
+    def __init__(self, args):
+        def new_measurement(row):
+            self.measurements.put(row)
+            self.measured.append(row)
+
+        self.serial = SerialSource(args.serial, args.baudrate) if args.serial else StreamSource(sys.stdin)
+        self.pause = False
+        self.measurements = Queue()
+        self.thread = threading.Thread(target=self.serial.handle_lines, args=[new_measurement])
+        self.thread.daemon = True
+        self.measured = []
+
+    def send_cmd(self, cmd, *arguments):
+        def mapper(s):
+            if type(s) == bool:
+                s = 1 if s else 0
+            elif type(s) == float:
+                return format(s, '.10f')
+
+            return str(s)
+
+        text = " ".join([cmd] + list(map(mapper, arguments)))
+        print(text)
+        self.serial.write(text + "\n")
+
+    def start(self):
+        self.thread.start()
+
+    def get_available(self, max_measures=10):
+        measurements = []
+        while not self.measurements.empty() and max_measures > 0:
+            measurements.append(self.measurements.get())
+            max_measures -= 1
+
+        return measurements
+
+

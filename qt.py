@@ -4,6 +4,7 @@ import sys
 
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QApplication, QWidget, QGridLayout
+from serial import Serial
 
 from input import Input
 import logging
@@ -14,7 +15,7 @@ from widgets import *
 
 class App:
     def __init__(self, args):
-        self.serial = Input(args.serial, args.baudrate)
+        self.serial = Input(args)
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_charts)
@@ -70,7 +71,7 @@ class App:
 logging.getLogger().setLevel(logging.DEBUG)
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--serial', default='/dev/ttyACM0')
+parser.add_argument('--serial')
 parser.add_argument('--baudrate', default=115200)
 args = parser.parse_args()
 

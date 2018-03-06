@@ -103,7 +103,8 @@ class ControlWidget(QDialog, Ui_ControlForm):
 
         self.mode.currentTextChanged.connect(self.send_cmd("mode"))
         self.const_p.valueChanged.connect(self.send_cmd("set_p"))
-        self.const_k.valueChanged.connect(self.send_cmd("set_k"))
+        self.const_d.valueChanged.connect(self.send_cmd("set_d"))
+        self.const_i.valueChanged.connect(self.send_cmd("set_i"))
         self.pauseBtn.clicked.connect(self.pause)
         self.enableServos.clicked.connect(self.send_cmd("enable_servos"))
         self.cmd.returnPressed.connect(self.prepare_cmd)

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'control.ui'
 #
-# Created by: PyQt5 UI code generator 5.10
+# Created by: PyQt5 UI code generator 5.10.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -83,12 +83,19 @@ class Ui_ControlForm(object):
         self.const_p.setProperty("value", 0.0)
         self.const_p.setObjectName("const_p")
         self.formLayout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.const_p)
-        self.const_k = QtWidgets.QDoubleSpinBox(self.tabWidgetPage1)
-        self.const_k.setDecimals(8)
-        self.const_k.setMinimum(-1e+18)
-        self.const_k.setMaximum(1e+19)
-        self.const_k.setObjectName("const_k")
-        self.formLayout.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.const_k)
+        self.const_d = QtWidgets.QDoubleSpinBox(self.tabWidgetPage1)
+        self.const_d.setDecimals(8)
+        self.const_d.setMinimum(-1e+18)
+        self.const_d.setMaximum(1e+19)
+        self.const_d.setObjectName("const_d")
+        self.formLayout.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.const_d)
+        self.label_4 = QtWidgets.QLabel(self.tabWidgetPage1)
+        self.label_4.setObjectName("label_4")
+        self.formLayout.setWidget(3, QtWidgets.QFormLayout.LabelRole, self.label_4)
+        self.const_i = QtWidgets.QDoubleSpinBox(self.tabWidgetPage1)
+        self.const_i.setDecimals(8)
+        self.const_i.setObjectName("const_i")
+        self.formLayout.setWidget(3, QtWidgets.QFormLayout.FieldRole, self.const_i)
         self.verticalLayout_2.addLayout(self.formLayout)
         self.tabWidget.addTab(self.tabWidgetPage1, "")
         self.plane = QtWidgets.QWidget()
@@ -99,7 +106,7 @@ class Ui_ControlForm(object):
         self.gridLayout.addWidget(self.splitter, 0, 0, 1, 1)
 
         self.retranslateUi(ControlForm)
-        self.tabWidget.setCurrentIndex(2)
+        self.tabWidget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(ControlForm)
 
     def retranslateUi(self, ControlForm):
@@ -112,8 +119,9 @@ class Ui_ControlForm(object):
         self.mode.setItemText(0, _translate("ControlForm", "balance"))
         self.mode.setItemText(1, _translate("ControlForm", "stop"))
         self.mode.setItemText(2, _translate("ControlForm", "demo"))
-        self.label_2.setText(_translate("ControlForm", "p"))
-        self.label_3.setText(_translate("ControlForm", "k"))
+        self.label_2.setText(_translate("ControlForm", "proportional"))
+        self.label_3.setText(_translate("ControlForm", "derivative"))
+        self.label_4.setText(_translate("ControlForm", "integration"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabWidgetPage1), _translate("ControlForm", "Parameters"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.plane), _translate("ControlForm", "Plate"))
 

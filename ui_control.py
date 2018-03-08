@@ -47,10 +47,6 @@ class Ui_ControlForm(object):
         self.cmd = QtWidgets.QLineEdit(self.tabWidgetPage1)
         self.cmd.setObjectName("cmd")
         self.horizontalLayout.addWidget(self.cmd)
-        self.current = QtWidgets.QLabel(self.tabWidgetPage1)
-        self.current.setText("")
-        self.current.setObjectName("current")
-        self.horizontalLayout.addWidget(self.current)
         self.enableServos = QtWidgets.QPushButton(self.tabWidgetPage1)
         self.enableServos.setCheckable(True)
         self.enableServos.setObjectName("enableServos")
@@ -98,11 +94,6 @@ class Ui_ControlForm(object):
         self.formLayout.setWidget(3, QtWidgets.QFormLayout.FieldRole, self.const_i)
         self.verticalLayout_2.addLayout(self.formLayout)
         self.tabWidget.addTab(self.tabWidgetPage1, "")
-        self.plane = QtWidgets.QWidget()
-        self.plane.setObjectName("plane")
-        self.verticalLayout_6 = QtWidgets.QVBoxLayout(self.plane)
-        self.verticalLayout_6.setObjectName("verticalLayout_6")
-        self.tabWidget.addTab(self.plane, "")
         self.gridLayout.addWidget(self.splitter, 0, 0, 1, 1)
 
         self.retranslateUi(ControlForm)
@@ -123,5 +114,4 @@ class Ui_ControlForm(object):
         self.label_3.setText(_translate("ControlForm", "derivative"))
         self.label_4.setText(_translate("ControlForm", "integration"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabWidgetPage1), _translate("ControlForm", "Parameters"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.plane), _translate("ControlForm", "Plate"))
 

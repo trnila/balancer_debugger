@@ -76,13 +76,6 @@
            <widget class="QLineEdit" name="cmd"/>
           </item>
           <item>
-           <widget class="QLabel" name="current">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="QPushButton" name="enableServos">
             <property name="text">
              <string>Enable servos</string>
@@ -189,12 +182,6 @@
          </layout>
         </item>
        </layout>
-      </widget>
-      <widget class="QWidget" name="plane">
-       <attribute name="title">
-        <string>Plate</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_6"/>
       </widget>
      </widget>
     </widget>

@@ -35,7 +35,6 @@ class App:
 
         control = ControlWidget(self)
         control.charts.layout().addWidget(self.win)
-        self.charts.append(control)
 
         self.timer.start(20)
         self.w.setLayout(control.layout())

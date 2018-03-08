@@ -101,16 +101,12 @@ class ControlWidget(QDialog, Ui_ControlForm):
         self.console.execute_command('%matplotlib inline')
         self.jupyter_console.layout().addWidget(self.console)
 
-        self.mode.currentTextChanged.connect(self.send_cmd("mode"))
         self.const_p.valueChanged.connect(self.send_cmd("set_p"))
         self.const_d.valueChanged.connect(self.send_cmd("set_d"))
         self.const_i.valueChanged.connect(self.send_cmd("set_i"))
         self.pauseBtn.clicked.connect(self.pause)
         self.enableServos.clicked.connect(self.send_cmd("enable_servos"))
         self.cmd.returnPressed.connect(self.prepare_cmd)
-
-        self.plane_ctrl = PlaneWidget()
-        self.plane.layout().addWidget(self.plane_ctrl)
 
     def send_cmd(self, cmd):
         def fn(*args):
@@ -123,65 +119,3 @@ class ControlWidget(QDialog, Ui_ControlForm):
 
     def pause(self, pause):
         self.serial.pause = pause
-
-    def new_measurement(self, row):
-        try:
-            self.current.setText("[{}, {}]".format(row['RX'], row['RY']))
-        except BaseException as e:
-            print(e)
-
-        self.plane_ctrl.new_measurement(row)
-
-
-class PlaneWidget(gl.GLViewWidget):
-    def __init__(self):
-        super().__init__()
-        self.opts['distance'] = 40
-
-        gx = gl.GLGridItem()
-        gx.rotate(90, 0, 1, 0)
-        gx.translate(-10, 0, 0)
-        self.addItem(gx)
-        gy = gl.GLGridItem()
-        gy.rotate(90, 1, 0, 0)
-        gy.translate(0, -10, 0)
-        self.addItem(gy)
-        gz = gl.GLGridItem()
-        gz.translate(0, 0, -10)
-        self.addItem(gz)
-
-        self.point = np.array([0, 0, 0])
-        self.normal = normalize(np.array([0, 0, 1]))
-
-        n = 10
-        self.y = np.linspace(-10, 10, n)
-        self.x = np.linspace(-10, 10, n)
-        self.z = np.zeros((len(self.x), len(self.y)))
-
-        self.plt = gl.GLSurfacePlotItem(x=self.x, y=self.y, z=self.z)
-        self.addItem(self.plt)
-        self.i = 0
-
-    def speed(self):
-        return [0.01, 0.01, 0]
-        return [random.randint(-1000, 1000), random.randint(-1000, 1000), 0]
-
-    def new_measurement(self, row):
-        return
-        self.i += 1
-        if self.i % 20 == 0:
-            self.normal = np.array([row['nx'], row['ny'], 1])
-            #self.normal += self.speed()
-            #self.normal = normalize(self.normal)
-
-            #d = np.dot(-point, normal)
-            d = 0
-
-            normal = self.normal
-            for xx, xxval in enumerate(self.x):
-                for yy, yyval in enumerate(self.y):
-                    self.z[xx, yy] = (-normal[0] * xxval - normal[1] * yyval - d) / normal[2]
-
-            self.plt.setData(x=self.x, y=self.y, z=self.z)
-
-

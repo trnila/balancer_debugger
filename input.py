@@ -142,4 +142,7 @@ class Input:
 
         return measurements
 
+    def clear_measured(self):
+        self.measured = []
+
 

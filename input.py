@@ -2,11 +2,12 @@ import logging
 import sys
 import threading
 import time
+import itertools
+import struct
 from collections import deque
 from queue import Queue
 
 from serial import Serial, SerialException
-
 
 def parse_line(line):
     def fix(pair):
@@ -15,6 +16,35 @@ def parse_line(line):
     row = dict([fix(i.split('=', 2)) for i in line.split(' ') if len(i.split('=', 2)) == 2])
     return row
 
+class TextLineReader:
+    """RX=val RY=val\n"""
+    def read_next(self, io):
+        line = io.readline()
+        row = parse_line(line)
+
+class BinaryReader:
+    def __init__(self):
+        fields = [
+            'c',
+            'v',
+            'pos',
+            'rv',
+            'ra',
+            'n',
+            'r',
+            'us',
+        ]
+
+        self.measures = list(itertools.chain(*[[f + 'x', f + 'y'] for f in fields]))
+
+    def read_next(self, io):
+        while True:
+            x = io.read(66)
+            if x[0] != 0xab or x[1] != 0xcd:
+                continue
+
+            values = struct.unpack("{}f".format(len(self.measures)), x[2:])
+            return dict(zip(self.measures, values))
 
 class RunningAverage:
     def __init__(self, keep_last=10):
@@ -27,25 +57,22 @@ class RunningAverage:
         if len(self.last) > self.size:
             self.last.popleft()
 
-    def avg(self):
-        return sum(self.last) / len(self.last)
-
     def median(self):
         items = sorted(self.last)
         return self.last[int(len(items) / 2)]
 
 
 class SerialSource:
-    def __init__(self, device, baud):
+    def __init__(self, device, baud, reader):
         self.serial = Serial(device, baudrate=baud)
         self.measures_keys_avg = RunningAverage()
+        self.reader = reader
 
     def handle_lines(self, announce):
         self._flush_input()
         while True:
             try:
-                line = self._readline()
-                row = parse_line(line)
+                row = self.reader.read_next(self.serial)
 
                 self.measures_keys_avg.add(len(row.keys()))
                 if self.measures_keys_avg.median() != len(row.keys()):
@@ -88,16 +115,14 @@ class SerialSource:
 
 
 class StreamSource:
-    def __init__(self, source):
+    def __init__(self, source, reader):
         self.source = source
+        self.reader = reader
 
     def handle_lines(self, announce):
         while True:
             try:
-                line = self.source.readline()
-                row = parse_line(line)
-
-                announce(row)
+                announce(self.reader.read_next(self.source))
             except Exception as e:
                 logging.exception(e)
 
@@ -111,7 +136,8 @@ class Input:
             self.measurements.put(row)
             self.measured.append(row)
 
-        self.serial = SerialSource(args.serial, args.baudrate) if args.serial else StreamSource(sys.stdin)
+        reader = BinaryReader()
+        self.serial = SerialSource(args.serial, args.baudrate, reader) if args.serial else StreamSource(sys.stdin, reader)
         self.pause = False
         self.measurements = Queue()
         self.thread = threading.Thread(target=self.serial.handle_lines, args=[new_measurement])

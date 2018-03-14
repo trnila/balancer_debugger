@@ -126,7 +126,7 @@ class StreamSource:
             except Exception as e:
                 logging.exception(e)
 
-    def write(self):
+    def write(self, msg):
         raise NotImplementedError()
 
 

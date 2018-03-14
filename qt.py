@@ -44,7 +44,7 @@ class App:
         self.app.exec_()
 
     def update_charts(self):
-        line = self.serial.get_available(1)
+        line = self.serial.get_available()
         if self.serial.pause or len(line) <= 0:
             return
 

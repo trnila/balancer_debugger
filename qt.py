@@ -68,6 +68,20 @@ class App:
 
 
 logging.getLogger().setLevel(logging.DEBUG)
+logging.getLogger('ipykernel.inprocess.ipkernel').setLevel(logging.ERROR)
+logging.getLogger('traitlets').setLevel(logging.ERROR)
+try:
+    import colorlog
+
+    handler = colorlog.StreamHandler()
+    handler.setFormatter(colorlog.ColoredFormatter(
+        '%(log_color)s%(levelname)s:%(name)s:%(message)s'))
+
+    logger = colorlog.getLogger()
+    logger.addHandler(handler)
+except ImportError:
+    # optional feature
+    pass
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--serial')

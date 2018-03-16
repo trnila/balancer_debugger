@@ -93,14 +93,14 @@ class ControlWidget(QDialog, Ui_ControlForm):
         self.setupUi(self)
 
         banner = [
-            "prepare() - return pandas dataframe",
+            "data() - return pandas dataframe",
             "clr() - clear dataframes"
         ]
 
         self.console = ConsoleWidget(customBanner="\n".join(banner) + "\n")
         self.console.push_vars({
             'serial': self.serial,
-            'prepare': lambda: pd.DataFrame(self.serial.measured),
+            'data': self.serial.create_dataframe,
             'clr': self.serial.clear_measured
         })
         self.console.execute_command("import pandas as pd")

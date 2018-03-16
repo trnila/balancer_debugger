@@ -4,6 +4,7 @@ import threading
 import time
 import itertools
 import struct
+import pandas as pd
 from collections import deque
 from queue import Queue
 
@@ -135,7 +136,9 @@ class Input:
     def __init__(self, args):
         def new_measurement(row):
             self.measurements.put(row)
-            self.measured.append(row)
+
+            with self.lock:
+                self.measured.append(row)
 
         reader = BinaryReader()
         self.serial = SerialSource(args.serial, args.baudrate, reader) if args.serial else StreamSource(sys.stdin.buffer, reader)
@@ -143,7 +146,10 @@ class Input:
         self.measurements = Queue()
         self.thread = threading.Thread(target=self.serial.handle_lines, args=[new_measurement])
         self.thread.daemon = True
+
         self.measured = []
+        self.lock = threading.Lock()
+
 
     def send_cmd(self, cmd, *arguments):
         def mapper(s):
@@ -172,4 +178,7 @@ class Input:
     def clear_measured(self):
         self.measured = []
 
+    def create_dataframe(self):
+        with self.lock:
+            return pd.DataFrame(self.measured)
 

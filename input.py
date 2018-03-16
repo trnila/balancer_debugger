@@ -33,13 +33,14 @@ class BinaryReader:
             'n',
             'r',
             'us',
+            'raw'
         ]
 
         self.measures = list(itertools.chain(*[[f + 'x', f + 'y'] for f in fields]))
 
     def read_next(self, io):
         while True:
-            x = io.read(66)
+            x = io.read(2 + len(self.measures) * 4)
             if x[0] != 0xab or x[1] != 0xcd:
                 continue
 
@@ -137,7 +138,7 @@ class Input:
             self.measured.append(row)
 
         reader = BinaryReader()
-        self.serial = SerialSource(args.serial, args.baudrate, reader) if args.serial else StreamSource(sys.stdin, reader)
+        self.serial = SerialSource(args.serial, args.baudrate, reader) if args.serial else StreamSource(sys.stdin.buffer, reader)
         self.pause = False
         self.measurements = Queue()
         self.thread = threading.Thread(target=self.serial.handle_lines, args=[new_measurement])

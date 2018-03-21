@@ -1,4 +1,5 @@
 from widgets import Touch
+import pyqtgraph as pg
 
 
 def setup_charts(app):
@@ -20,6 +21,7 @@ def setup_charts(app):
     app.charts.append(Touch(p3, ['rx', 'ry'], lastPoints=10))
 
     app.next_row()
+    app.plot(['rawx', 'rawy'], [0, 4000], colspan=2, title='raw')
     app.plot(['cx', 'cy'], [-1, 1], colspan=2, title='change')
     app.plot(['usx', 'usy'], [500, 1500], colspan=2, title='USX/USY')
 
@@ -28,5 +30,6 @@ def setup_charts(app):
     p3.setYRange(0, 300)
     app.charts.append(Touch(p3, ['posx', 'posy']))
 
-    app.plot(['rawx', 'rawy'], [0, 4000], colspan=2, title='raw')
+    roi = pg.RectROI([0, 0], [170, 230], pen=(0, 9))
+    p3.addItem(roi)
 

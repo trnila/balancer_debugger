@@ -114,9 +114,9 @@ class ControlWidget(QDialog, Ui_ControlForm):
         self.enableServos.clicked.connect(self.send_cmd("enable_servos"))
         self.cmd.returnPressed.connect(self.prepare_cmd)
 
-        self.const_p.setValue(0.0000250000)
-        self.const_d.setValue(0.0000156250)
-        self.const_i.setValue(0.0000100000)
+        self.const_p.setValue(0.00002)
+        self.const_d.setValue(0.00001)
+        self.const_i.setValue(0.00002)
 
     def send_cmd(self, cmd):
         def fn(*args):

@@ -38,15 +38,19 @@ class BinaryReader:
         ]
 
         self.measures = list(itertools.chain(*[[f + 'x', f + 'y'] for f in fields]))
+        self.buffer = bytearray(128)
 
     def read_next(self, io):
+        prev = 0
         while True:
-            x = io.read(2 + len(self.measures) * 4)
-            if x[0] != 0xab or x[1] != 0xcd:
-                continue
+            cur = io.read()[0]
+            if prev == 0xab and cur == 0xcd:
+                break
+            prev = cur
 
-            values = struct.unpack("{}f".format(len(self.measures)), x[2:])
-            return dict(zip(self.measures, values))
+        x = io.read(len(self.measures) * 4)
+        values = struct.unpack("{}f".format(len(self.measures)), x)
+        return dict(zip(self.measures, values))
 
 class RunningAverage:
     def __init__(self, keep_last=10):

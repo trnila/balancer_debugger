@@ -132,13 +132,6 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>derivative</string>
-            </property>
-           </widget>
-          </item>
           <item row="1" column="1">
            <widget class="QDoubleSpinBox" name="const_p">
             <property name="decimals">
@@ -152,7 +145,28 @@
             </property>
            </widget>
           </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>integration</string>
+            </property>
+           </widget>
+          </item>
           <item row="2" column="1">
+           <widget class="QDoubleSpinBox" name="const_i">
+            <property name="decimals">
+             <number>8</number>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>derivative</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
            <widget class="QDoubleSpinBox" name="const_d">
             <property name="decimals">
              <number>8</number>
@@ -162,20 +176,6 @@
             </property>
             <property name="maximum">
              <double>10000000000000000000.000000000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_4">
-            <property name="text">
-             <string>integration</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QDoubleSpinBox" name="const_i">
-            <property name="decimals">
-             <number>8</number>
             </property>
            </widget>
           </item>

@@ -10,6 +10,7 @@ from queue import Queue
 
 from serial import Serial, SerialException
 
+
 def parse_line(line):
     def fix(pair):
         return pair[0], float(pair[1])
@@ -17,11 +18,14 @@ def parse_line(line):
     row = dict([fix(i.split('=', 2)) for i in line.split(' ') if len(i.split('=', 2)) == 2])
     return row
 
+
 class TextLineReader:
     """RX=val RY=val\n"""
+
     def read_next(self, io):
         line = io.readline()
         row = parse_line(line)
+
 
 class BinaryReader:
     def __init__(self):
@@ -38,7 +42,6 @@ class BinaryReader:
         ]
 
         self.measures = list(itertools.chain(*[[f + 'x', f + 'y'] for f in fields]))
-        self.buffer = bytearray(128)
 
     def read_next(self, io):
         prev = 0
@@ -51,6 +54,7 @@ class BinaryReader:
         x = io.read(len(self.measures) * 4)
         values = struct.unpack("{}f".format(len(self.measures)), x)
         return dict(zip(self.measures, values))
+
 
 class RunningAverage:
     def __init__(self, keep_last=10):
@@ -145,7 +149,8 @@ class Input:
                 self.measured.append(row)
 
         reader = BinaryReader()
-        self.serial = SerialSource(args.serial, args.baudrate, reader) if args.serial else StreamSource(sys.stdin.buffer, reader)
+        self.serial = SerialSource(args.serial, args.baudrate, reader) if args.serial else StreamSource(
+            sys.stdin.buffer, reader)
         self.pause = False
         self.measurements = Queue()
         self.thread = threading.Thread(target=self.serial.handle_lines, args=[new_measurement])
@@ -153,7 +158,6 @@ class Input:
 
         self.measured = []
         self.lock = threading.Lock()
-
 
     def send_cmd(self, cmd, *arguments):
         def mapper(s):
@@ -185,4 +189,3 @@ class Input:
     def create_dataframe(self):
         with self.lock:
             return pd.DataFrame(self.measured)
-

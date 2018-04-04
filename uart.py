@@ -43,8 +43,9 @@ class MeasureEncoder:
 
 
 class Client:
-    def __init__(self, serial):
+    def __init__(self, serial: Serial):
         self.serial = serial
+        self.serial.timeout = 0.02
         self.cmds = {
             'reset': Command(0),
             'pos': Command(1, ('x', 'I'), ('y', 'I')),
@@ -53,6 +54,7 @@ class Client:
         self.encoders = {
             128: MeasureEncoder()
         }
+        self.buffer = b""
 
     def _reopen(self):
         self.serial.close()
@@ -70,13 +72,19 @@ class Client:
     def read_next(self):
         while True:
             try:
-                data = self.serial.read_until(b"\0")[:-1]
+                pos = 0
+                while True:
+                    pos = self.buffer.find(b"\0")
+                    if pos >= 0:
+                        break
+                    self.buffer += self.serial.read(128)
 
-                data = cobs.decode(data)
+                data = cobs.decode(self.buffer[:pos])
 
                 cmd = data[0]
                 body = data[1:]
 
+                self.buffer = self.buffer[pos+1:]
                 return cmd, self.encoders[cmd](body)
             except SerialException as e:
                 logging.exception(e)

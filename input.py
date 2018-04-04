@@ -15,7 +15,7 @@ class SerialSource:
         while True:
             try:
                 row = self.source.read_next()
-                #announce(row[1])
+                announce(row[1])
             except Exception as e:
                 logging.exception(e)
 

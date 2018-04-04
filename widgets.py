@@ -120,12 +120,14 @@ class ControlWidget(QDialog, Ui_ControlForm):
 
         app.serial.pos_changed.connect(self.on_pos_changed)
         app.serial.pid_changed.connect(self.on_pid_changed)
+        app.serial.dim_changed.connect(self.on_dim_changed)
 
         self.refresh()
 
     def refresh(self):
         self.client.get_pid()
         self.client.get_pos()
+        self.client.get_dim()
 
     def on_pos_changed(self, x, y):
         self.pos_x.setValue(x)
@@ -135,6 +137,10 @@ class ControlWidget(QDialog, Ui_ControlForm):
         self.const_p.setValue(p)
         self.const_i.setValue(i)
         self.const_d.setValue(d)
+
+    def on_dim_changed(self, size_x, size_y):
+        self.pos_x.setMaximum(size_x)
+        self.pos_y.setMaximum(size_y)
 
     def send_pid(self):
         self.client.set_pid(

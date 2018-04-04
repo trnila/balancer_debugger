@@ -13,6 +13,7 @@ from serial import Serial
 class Input(QObject):
     pos_changed = pyqtSignal(int, int)
     pid_changed = pyqtSignal(float, float, float)
+    dim_changed = pyqtSignal(int, int)
 
     def __init__(self, args):
         super().__init__()
@@ -22,16 +23,18 @@ class Input(QObject):
                 try:
                     cmd, data = self.client.read_next()
 
-                    if cmd == 128:
+                    if cmd == uart.CMD_MEASUREMENT | uart.CMD_RESPONSE:
                         self.measurements.put(data)
 
                         with self.lock:
                             self.measured.append(data)
                     else:
-                        if cmd == 193:
+                        if cmd == uart.CMD_GETPOS | uart.CMD_RESPONSE:
                             self.pos_changed.emit(data[0], data[1])
-                        elif cmd == 194:
-                            self.pid_changed.emit(*data)
+                        elif cmd == uart.CMD_GETPID | uart.CMD_RESPONSE:
+                            self.pid_changed.emit(data[0], data[1], data[2])
+                        elif cmd == uart.CMD_GETDIM | uart.CMD_RESPONSE:
+                            self.dim_changed.emit(data[0], data[1])
                 except Exception as e:
                     logging.exception(e)
 

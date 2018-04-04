@@ -15,6 +15,7 @@ CMD_PID = 2
 
 CMD_GETPOS = CMD_GETTER | CMD_POS
 CMD_GETPID = CMD_GETTER | CMD_PID
+CMD_GETDIM = CMD_GETTER | (CMD_PID + 1)
 
 CMD_MEASUREMENT = 0 | CMD_RESPONSE
 
@@ -59,7 +60,8 @@ class ClientBase:
         self.encoders = {
             CMD_MEASUREMENT | CMD_RESPONSE: MeasureDecoder(),
             CMD_GETPOS | CMD_RESPONSE: BinaryDecoder("II"),
-            CMD_GETPID | CMD_RESPONSE: BinaryDecoder("ddd")
+            CMD_GETPID | CMD_RESPONSE: BinaryDecoder("ddd"),
+            CMD_GETDIM | CMD_RESPONSE: BinaryDecoder("II"),
         }
         self.buffer = b""
 
@@ -124,6 +126,9 @@ class Client(ClientBase):
 
     def get_pos(self):
         self.send(encode(CMD_GETPOS))
+
+    def get_dim(self):
+        self.send(encode(CMD_GETDIM))
 
 
 if __name__ == "__main__":

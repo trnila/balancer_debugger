@@ -1,60 +1,57 @@
 import logging
 import threading
+
 import pandas as pd
 from queue import Queue
+
+from PyQt5.QtCore import pyqtSignal, QObject
 
 import uart
 from serial import Serial
 
 
-class SerialSource:
-    def __init__(self, device, baud):
-        self.source = uart.Client(Serial(device, baudrate=baud))
+class Input(QObject):
+    pos_changed = pyqtSignal(int, int)
+    pid_changed = pyqtSignal(float, float, float)
 
-    def handle_lines(self, announce):
-        while True:
-            try:
-                row = self.source.read_next()
-                announce(row[1])
-            except Exception as e:
-                logging.exception(e)
-
-
-class Input:
     def __init__(self, args):
-        def new_measurement(row):
-            self.measurements.put(row)
+        super().__init__()
 
-            with self.lock:
-                self.measured.append(row)
+        def frame_handler():
+            while True:
+                try:
+                    cmd, data = self.client.read_next()
 
-        self.serial = SerialSource(args.serial, args.baudrate)
+                    if cmd == 128:
+                        self.measurements.put(data)
+
+                        with self.lock:
+                            self.measured.append(data)
+                    else:
+                        if cmd == 193:
+                            self.pos_changed.emit(data[0], data[1])
+                        elif cmd == 194:
+                            self.pid_changed.emit(*data)
+                except Exception as e:
+                    logging.exception(e)
+
+        self.client = uart.Client(Serial(args.serial, baudrate=args.baudrate))
         self.pause = False
         self.measurements = Queue()
-        self.thread = threading.Thread(target=self.serial.handle_lines, args=[new_measurement])
+        self.thread = threading.Thread(target=frame_handler)
         self.thread.daemon = True
 
         self.measured = []
         self.lock = threading.Lock()
 
     def send_cmd(self, cmd, *arguments):
-        def mapper(s):
-            if type(s) == bool:
-                s = 1 if s else 0
-            elif type(s) == float:
-                return format(s, '.10f')
-
-            return str(s)
-
-        text = " ".join([cmd] + list(map(mapper, arguments)))
-        print(text)
-        #self.serial.write(text + "\n")
+        getattr(self.client, cmd)(*arguments)
 
     def start(self):
         self.thread.start()
 
     def get_available(self, max_measures=10):
-        print((self.measurements.qsize()))
+        #print(self.measurements.qsize())
         measurements = []
         while not self.measurements.empty() and max_measures > 0:
             measurements.append(self.measurements.get())

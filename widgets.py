@@ -3,6 +3,7 @@ from collections import deque
 from PyQt5.QtWidgets import QDialog
 from PyQt5 import QtCore
 
+from uart import Client
 from ui_control import Ui_ControlForm
 import pyqtgraph as pg
 import numpy as np
@@ -89,7 +90,7 @@ class Touch:
 class ControlWidget(QDialog, Ui_ControlForm):
     def __init__(self, app):
         super(QDialog, self).__init__()
-        self.serial = app.serial
+        self.client: Client = app.serial.client
         self.setupUi(self)
 
         banner = [
@@ -99,33 +100,54 @@ class ControlWidget(QDialog, Ui_ControlForm):
 
         self.console = ConsoleWidget(customBanner="\n".join(banner) + "\n")
         self.console.push_vars({
-            'serial': self.serial,
-            'data': self.serial.create_dataframe,
-            'clr': self.serial.clear_measured
+            'serial': self.client,
+            'data': app.serial.create_dataframe,
+            'clr': app.serial.clear_measured
         })
         self.console.execute_command("import pandas as pd")
         self.console.execute_command('%matplotlib inline')
         self.jupyter_console.layout().addWidget(self.console)
 
-        self.const_p.valueChanged.connect(self.send_cmd("set_p"))
-        self.const_d.valueChanged.connect(self.send_cmd("set_d"))
-        self.const_i.valueChanged.connect(self.send_cmd("set_i"))
+        self.const_p.valueChanged.connect(self.send_pid)
+        self.const_d.valueChanged.connect(self.send_pid)
+        self.const_i.valueChanged.connect(self.send_pid)
+        self.pos_x.valueChanged.connect(self.send_pos)
+        self.pos_y.valueChanged.connect(self.send_pos)
+
+        self.refreshBtn.clicked.connect(self.refresh)
         self.pauseBtn.clicked.connect(self.pause)
-        self.enableServos.clicked.connect(self.send_cmd("enable_servos"))
-        self.cmd.returnPressed.connect(self.prepare_cmd)
+        #self.enableServos.clicked.connect(self.send_cmd("enable_servos"))
 
-        self.const_p.setValue(0.00002)
-        self.const_d.setValue(0.00001)
-        self.const_i.setValue(0.00002)
+        app.serial.pos_changed.connect(self.on_pos_changed)
+        app.serial.pid_changed.connect(self.on_pid_changed)
 
-    def send_cmd(self, cmd):
-        def fn(*args):
-            self.serial.send_cmd(cmd, *args)
-        return fn
+        self.refresh()
 
-    def prepare_cmd(self):
-        args = self.cmd.text().split(' ')
-        self.serial.send_cmd(*args)
+    def refresh(self):
+        self.client.get_pid()
+        self.client.get_pos()
+
+    def on_pos_changed(self, x, y):
+        self.pos_x.setValue(x)
+        self.pos_y.setValue(y)
+
+    def on_pid_changed(self, p, i, d):
+        self.const_p.setValue(p)
+        self.const_i.setValue(i)
+        self.const_d.setValue(d)
+
+    def send_pid(self):
+        self.client.set_pid(
+            float(self.const_p.text()),
+            float(self.const_i.text()),
+            float(self.const_d.text()),
+        )
+
+    def send_pos(self):
+        self.client.set_pos(
+            int(self.pos_x.text()),
+            int(self.pos_y.text())
+        )
 
     def pause(self, pause):
-        self.serial.pause = pause
+        self.client.pause = pause

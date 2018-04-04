@@ -4,25 +4,27 @@ import logging
 from cobs import cobs
 from serial import Serial, SerialException
 import struct
-import time
 
 
-class Command:
-    def __init__(self, num, *args):
-        self.id = num
-        self.args = args
+CMD_RESPONSE = 128
+CMD_GETTER = 64
 
-    def __call__(self, **kwargs):
-        args = [kwargs[i[0]] for i in self.args]
-        fmt = "".join([i[1] for i in self.args])
+CMD_RESET = 0
+CMD_POS = 1
+CMD_PID = 2
 
-        binary = struct.pack(("=B" + fmt), self.id, *args)
-        encoded = cobs.encode(bytearray(binary))
-        s.write(encoded + b"\0")
-        print(len(encoded))
+CMD_GETPOS = CMD_GETTER | CMD_POS
+CMD_GETPID = CMD_GETTER | CMD_PID
+
+CMD_MEASUREMENT = 0 | CMD_RESPONSE
 
 
-class MeasureEncoder:
+def encode(cmd_id, fmt="", *args):
+    binary = struct.pack("=B" + fmt, cmd_id, *args)
+    return cobs.encode(bytearray(binary))
+
+
+class MeasureDecoder:
     def __init__(self):
         self.fields = [
             'c',
@@ -42,17 +44,22 @@ class MeasureEncoder:
         return dict(zip(measures, values))
 
 
-class Client:
+class BinaryDecoder:
+    def __init__(self, fmt):
+        self.fmt = fmt
+
+    def __call__(self, body, *args, **kwargs):
+        return struct.unpack("=" + self.fmt, body)
+
+
+class ClientBase:
     def __init__(self, serial: Serial):
         self.serial = serial
         self.serial.timeout = 0.02
-        self.cmds = {
-            'reset': Command(0),
-            'pos': Command(1, ('x', 'I'), ('y', 'I')),
-            'pid': Command(2, ('p', 'd'), ('i', 'd'), ('d', 'd'))
-        }
         self.encoders = {
-            128: MeasureEncoder()
+            CMD_MEASUREMENT | CMD_RESPONSE: MeasureDecoder(),
+            CMD_GETPOS | CMD_RESPONSE: BinaryDecoder("II"),
+            CMD_GETPID | CMD_RESPONSE: BinaryDecoder("ddd")
         }
         self.buffer = b""
 
@@ -92,8 +99,31 @@ class Client:
             except Exception as e:
                 logging.exception(e)
 
-    def __getattr__(self, item):
-        return self.cmds[item]
+    def _encode(self, cmd, data):
+        if cmd in self.encoders:
+            return self.encoders[cmd]
+
+        return data
+
+    def send(self, data):
+        self.serial.write(data + b"\0")
+
+
+class Client(ClientBase):
+    def reset(self):
+        self.send(encode(CMD_RESET))
+
+    def set_pid(self, p, i, d):
+        self.send(encode(CMD_PID, "ddd", p, i, d))
+
+    def set_pos(self, x, y):
+        self.send(encode(CMD_POS, "II", x, y))
+
+    def get_pid(self):
+        self.send(encode(CMD_GETPID))
+
+    def get_pos(self):
+        self.send(encode(CMD_GETPOS))
 
 
 if __name__ == "__main__":
@@ -109,7 +139,9 @@ if __name__ == "__main__":
 
         while True:
             try:
-                print(c.read_next())
+                cmd, data = c.read_next()
+                if cmd != 128:
+                    print((cmd, data))
             except Exception as e:
                 logging.exception(e)
 
@@ -121,7 +153,8 @@ if __name__ == "__main__":
     import time
 
     while True:
-        c.pos(x=int(170 / 2), y=80)
+        c.get_pos()
         time.sleep(1)
-        c.pos(x=int(170 / 2), y=160)
+
+        c.get_pid()
         time.sleep(1)

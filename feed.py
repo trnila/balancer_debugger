@@ -1,7 +1,7 @@
 import errno
 import logging
 
-import serial
+import uart
 import time
 import random
 from subprocess import Popen
@@ -54,9 +54,9 @@ def terminate_socat():
 
 for i in range(0, CONNECT_TRIES):
     try:
-        ser = serial.Serial(SERIAL_WRITER)
+        ser = uart.Serial(SERIAL_WRITER)
         break
-    except serial.SerialException as e:
+    except uart.SerialException as e:
         if e.errno == errno.ENOENT:
             time.sleep(0.1)
 

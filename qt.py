@@ -4,7 +4,7 @@ import sys
 
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QApplication, QWidget, QGridLayout
-from serial import Serial
+from uart import Serial
 
 from input import Input
 import logging
@@ -84,8 +84,8 @@ except ImportError:
     pass
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--serial')
-parser.add_argument('--baudrate', default=115200)
+parser.add_argument('--serial', default='/dev/ttyUSB0')
+parser.add_argument('--baudrate', default=460800)
 args = parser.parse_args()
 
 

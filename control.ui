@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>529</width>
-    <height>292</height>
+    <height>297</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -73,15 +73,26 @@
            </spacer>
           </item>
           <item>
-           <widget class="QLineEdit" name="cmd"/>
-          </item>
-          <item>
            <widget class="QPushButton" name="enableServos">
             <property name="text">
              <string>Enable servos</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton">
+            <property name="text">
+             <string>Reset</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="refreshBtn">
+            <property name="text">
+             <string>Refresh</string>
             </property>
            </widget>
           </item>
@@ -178,6 +189,26 @@
              <double>10000000000000000000.000000000000000</double>
             </property>
            </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="label_5">
+            <property name="text">
+             <string>target posx</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="label_6">
+            <property name="text">
+             <string>target posy</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QSpinBox" name="pos_x"/>
+          </item>
+          <item row="5" column="1">
+           <widget class="QSpinBox" name="pos_y"/>
           </item>
          </layout>
         </item>

@@ -5,6 +5,7 @@ from cobs import cobs
 from serial import Serial, SerialException
 import struct
 
+import protocol
 
 CMD_RESPONSE = 128
 CMD_GETTER = 64
@@ -111,7 +112,7 @@ class ClientBase:
         self.serial.write(data + b"\0")
 
 
-class Client(ClientBase):
+class Client(ClientBase, protocol.Protocol):
     def reset(self):
         self.send(encode(CMD_RESET))
 

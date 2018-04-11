@@ -84,8 +84,9 @@ except ImportError:
     pass
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--serial', default='/dev/ttyUSB0')
+parser.add_argument('--serial')
 parser.add_argument('--baudrate', default=460800)
+parser.add_argument('--csv')
 args = parser.parse_args()
 
 

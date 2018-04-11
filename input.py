@@ -1,13 +1,32 @@
+import csv
 import logging
 import threading
+import time
 
 import pandas as pd
 from queue import Queue
 
 from PyQt5.QtCore import pyqtSignal, QObject
 
+import protocol
 import uart
 from serial import Serial
+
+
+class CSVInput(protocol.Protocol):
+    def __init__(self, file):
+        self.i = 0
+        with open(file) as data:
+            r = csv.DictReader(data)
+            self.measurements = [{k: float(v) for k, v in i.items()} for i in list(r)]
+
+    def read_next(self):
+        time.sleep(0.02)
+
+        measurement = self.measurements[self.i]
+        self.i = (self.i + 1) % len(self.measurements)
+
+        return (uart.CMD_MEASUREMENT | uart.CMD_RESPONSE), measurement
 
 
 class Input(QObject):
@@ -38,7 +57,10 @@ class Input(QObject):
                 except Exception as e:
                     logging.exception(e)
 
-        self.client = uart.Client(Serial(args.serial, baudrate=args.baudrate))
+        if args.serial:
+            self.client = uart.Client(Serial(args.serial, baudrate=args.baudrate))
+        else:
+            self.client = CSVInput(args.csv)
         self.pause = False
         self.measurements = Queue()
         self.thread = threading.Thread(target=frame_handler)

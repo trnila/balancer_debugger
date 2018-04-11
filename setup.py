@@ -23,7 +23,7 @@ def setup_charts(app):
     app.next_row()
     app.plot(['rawx', 'rawy'], [0, 4000], colspan=2, title='raw')
     app.plot(['cx', 'cy'], [-1, 1], colspan=2, title='change')
-    app.plot(['usx', 'usy'], [500, 1500], colspan=2, title='USX/USY')
+    app.plot(['usx', 'usy'], [900, 2100], colspan=2, title='USX/USY')
 
     p3 = app.win.addPlot(colspan=1, title="position")
     p3.setXRange(0, 300)

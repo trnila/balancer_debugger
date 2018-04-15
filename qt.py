@@ -24,6 +24,7 @@ class App:
         self.app = QApplication([])
         self.w = QWidget()
         self.win = pg.MultiPlotWidget()
+        self.pause = False
 
     def next_row(self):
         self.win.nextRow()
@@ -45,7 +46,7 @@ class App:
 
     def update_charts(self):
         line = self.serial.get_available()
-        if self.serial.pause or len(line) <= 0:
+        if self.pause:
             return
 
         for row in line:

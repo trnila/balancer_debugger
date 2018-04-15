@@ -92,6 +92,7 @@ class ControlWidget(QDialog, Ui_ControlForm):
         super(QDialog, self).__init__()
         self.client: Client = app.serial.client
         self.setupUi(self)
+        self.app = app
 
         banner = [
             "data() - return pandas dataframe",
@@ -156,4 +157,4 @@ class ControlWidget(QDialog, Ui_ControlForm):
         )
 
     def pause(self, pause):
-        self.client.pause = pause
+        self.app.pause = pause

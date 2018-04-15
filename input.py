@@ -10,7 +10,7 @@ from PyQt5.QtCore import pyqtSignal, QObject
 
 import protocol
 import uart
-from serial import Serial
+from serial import serial_for_url
 
 
 class CSVInput(protocol.Protocol):
@@ -58,7 +58,7 @@ class Input(QObject):
                     logging.exception(e)
 
         if args.serial:
-            self.client = uart.Client(Serial(args.serial, baudrate=args.baudrate))
+            self.client = uart.Client(serial_for_url(args.serial, baudrate=args.baudrate))
         else:
             self.client = CSVInput(args.csv)
         self.pause = False

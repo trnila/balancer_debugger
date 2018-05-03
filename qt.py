@@ -3,8 +3,7 @@ import signal
 import sys
 
 from PyQt5.QtCore import QTimer
-from PyQt5.QtWidgets import QApplication, QWidget, QGridLayout
-from uart import Serial
+from PyQt5.QtWidgets import QApplication, QWidget
 
 from input import Input
 import logging

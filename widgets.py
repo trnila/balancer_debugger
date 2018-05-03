@@ -1,14 +1,10 @@
 from collections import deque
 
 from PyQt5.QtWidgets import QDialog
-from PyQt5 import QtCore
-
 from uart import Client
 from ui_control import Ui_ControlForm
 import pyqtgraph as pg
 import numpy as np
-import pandas as pd
-import pyqtgraph.opengl as gl
 
 from ipython import ConsoleWidget
 

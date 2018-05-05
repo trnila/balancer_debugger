@@ -13,6 +13,7 @@ CMD_GETTER = 64
 CMD_RESET = 0
 CMD_POS = 1
 CMD_PID = 2
+CMD_DISABLE_SERVOS = 3
 
 CMD_GETPOS = CMD_GETTER | CMD_POS
 CMD_GETPID = CMD_GETTER | CMD_PID
@@ -130,6 +131,9 @@ class Client(ClientBase, protocol.Protocol):
 
     def get_dim(self):
         self.send(encode(CMD_GETDIM))
+
+    def disable_servos(self, disable):
+        self.send(encode(CMD_DISABLE_SERVOS, "b", disable))
 
 
 if __name__ == "__main__":

@@ -113,7 +113,7 @@ class ControlWidget(QDialog, Ui_ControlForm):
 
         self.refreshBtn.clicked.connect(self.refresh)
         self.pauseBtn.clicked.connect(self.pause)
-        #self.enableServos.clicked.connect(self.send_cmd("enable_servos"))
+        self.enableServos.clicked.connect(self.enable_servos)
 
         app.serial.pos_changed.connect(self.on_pos_changed)
         app.serial.pid_changed.connect(self.on_pid_changed)
@@ -151,6 +151,9 @@ class ControlWidget(QDialog, Ui_ControlForm):
             int(self.pos_x.text()),
             int(self.pos_y.text())
         )
+
+    def enable_servos(self, checked):
+        self.client.disable_servos(not checked)
 
     def pause(self, pause):
         self.app.pause = pause

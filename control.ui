@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>529</width>
-    <height>297</height>
+    <width>531</width>
+    <height>313</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -80,6 +80,9 @@
             <property name="checkable">
              <bool>true</bool>
             </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
           <item>
@@ -111,39 +114,13 @@
         <item>
          <layout class="QFormLayout" name="formLayout">
           <item row="0" column="0">
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>mode</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QComboBox" name="mode">
-            <item>
-             <property name="text">
-              <string>balance</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>stop</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>demo</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-          <item row="1" column="0">
            <widget class="QLabel" name="label_2">
             <property name="text">
              <string>proportional</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
+          <item row="0" column="1">
            <widget class="QDoubleSpinBox" name="const_p">
             <property name="decimals">
              <number>8</number>
@@ -156,28 +133,28 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
+          <item row="1" column="0">
            <widget class="QLabel" name="label_4">
             <property name="text">
              <string>integration</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
+          <item row="1" column="1">
            <widget class="QDoubleSpinBox" name="const_i">
             <property name="decimals">
              <number>8</number>
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
+          <item row="2" column="0">
            <widget class="QLabel" name="label_3">
             <property name="text">
              <string>derivative</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
+          <item row="2" column="1">
            <widget class="QDoubleSpinBox" name="const_d">
             <property name="decimals">
              <number>8</number>
@@ -190,14 +167,17 @@
             </property>
            </widget>
           </item>
-          <item row="4" column="0">
+          <item row="3" column="0">
            <widget class="QLabel" name="label_5">
             <property name="text">
              <string>target posx</string>
             </property>
            </widget>
           </item>
-          <item row="5" column="0">
+          <item row="3" column="1">
+           <widget class="QSpinBox" name="pos_x"/>
+          </item>
+          <item row="4" column="0">
            <widget class="QLabel" name="label_6">
             <property name="text">
              <string>target posy</string>
@@ -205,9 +185,6 @@
            </widget>
           </item>
           <item row="4" column="1">
-           <widget class="QSpinBox" name="pos_x"/>
-          </item>
-          <item row="5" column="1">
            <widget class="QSpinBox" name="pos_y"/>
           </item>
          </layout>

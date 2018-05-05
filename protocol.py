@@ -16,3 +16,6 @@ class Protocol:
 
     def get_dim(self):
         pass
+
+    def disable_servos(self, disable):
+        pass

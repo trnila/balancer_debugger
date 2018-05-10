@@ -6,8 +6,10 @@ def setup_charts(app):
     app.next_row()
 #    app.plot(['nx', 'ny'], [-1, 1], colspan=2, title='normal')
     app.plot(['posx', 'posy'], [0, 300], colspan=2, title='pos')
-    app.plot(['vx', 'vy'], [-20, 20], colspan=2, title='speed')
-    app.plot(['rax', 'ray'], [-2, 2], colspan=2, title='acceleration')
+    app.plot(['rawx', 'rx'], [0, 4000], colspan=2, title='X')
+    app.plot(['rawy', 'ry'], [0, 4000], colspan=2, title='Y')
+    #app.plot(['vx', 'vy'], [-20, 20], colspan=2, title='speed')
+    #app.plot(['rax', 'ray'], [-2, 2], colspan=2, title='acceleration')
 
     #p3 = app.win.addPlot(colspan=1, title="Normal")
     #p3.setXRange(-0.3, 0.3)
